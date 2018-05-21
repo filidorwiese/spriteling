@@ -1,0 +1,27 @@
+{
+  "name": "spriteling",
+  "version": "0.0.1",
+  "description": "Scripted Spritesheet Animation",
+  "main": "src/spriteling.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/filidorwiese/spriteling.git"
+  },
+  "keywords": [
+    "sprite",
+    "sprites",
+    "spritesheet",
+    "animation",
+    "animator",
+    "motion"
+  ],
+  "author": "Filidor Wiese",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/filidorwiese/spriteling/issues"
+  },
+  "homepage": "https://github.com/filidorwiese/spriteling#readme"
+}
