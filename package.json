@@ -33,5 +33,9 @@
     "babel-preset-stage-2": "6.24.1",
     "rollup-plugin-babel": "3.0.4",
     "rollup-plugin-node-resolve": "3.3.0"
+  },
+  "dependencies": {
+    "image-loaded": "0.0.2",
+    "raf": "3.4.0"
   }
 }
