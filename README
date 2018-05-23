@@ -2,9 +2,9 @@ First version in the make
 
 TODO:
 * event bus
-* callbacks
+* chaining?
 * fix loop?
-* conver to stypescript?
+* convert to typescript?
 * jsdoc
 * debug logging
 * cross-browser testing

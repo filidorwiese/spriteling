@@ -109,71 +109,54 @@
 
   // Buttons
   document.querySelector('#look-around').addEventListener('click', function () {
-    new Log('Ossy: look-around')
     sprite.play('look-around', {
       run: 1,
       delay: 100,
       onStop: function () {
-        new Log('Ossy: done look-around')
         sprite.play('blink')
       }
     })
   })
 
   document.querySelector('#wiggle').addEventListener('click', function () {
-    new Log('Ossy: wiggle')
     sprite.play('wiggle', {
       run: 1,
       delay: 100,
       onStop: function () {
-        new Log('Ossy: done wiggle')
         sprite.play('blink')
       }
     })
   })
 
   document.querySelector('#paw').addEventListener('click', function () {
-    new Log('Ossy: paw')
     sprite.play('paw', {
       run: 1,
       delay: 100,
       onStop: function () {
-        new Log('Ossy: done paw')
         sprite.play('blink')
       }
     })
   })
 
   document.querySelector('#lay-down').addEventListener('click', function () {
-    new Log('Ossy: lay-down')
     sprite.play('lay-down', {
       run: 1,
       delay: 100,
       onStop: function () {
-        new Log('Ossy: done lay-down')
-        sprite.play('blink')
+        sprite.play('stand-up')
       }
     })
   })
 
   document.querySelector('#stand-up').addEventListener('click', function () {
-    new Log('Ossy: stand-up')
     sprite.play('stand-up', {
       run: 1,
       delay: 100,
       onStop: function () {
-        new Log('Ossy: done stand-up')
         sprite.play('blink')
       }
     })
   })
-
-  // Utility log function
-  function Log (logline) {
-    if (typeof console !== 'undefined') {
-      console.log(logline)
-    }
-  }
 </script>
 
 </body>

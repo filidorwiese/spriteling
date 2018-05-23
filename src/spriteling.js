@@ -74,7 +74,6 @@ class Spriteling {
     // No element found, let's create one instead
     if (!this._element) {
       this._element = document.createElement('div')
-      this._element.style.cssText = 'position: absolute; top: 0; left: 0; z-index: 10000; color: blue; border: 10px solid red; width: 100px; height: 100px;'
       document.body.appendChild(this._element)
     }
 
@@ -191,7 +190,7 @@ class Spriteling {
     this._playhead.currentFrame = frameNumber
     const frame = this._playhead.script[this._playhead.currentFrame]
     if (frame !== undefined) {
-      // this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite)
+      this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite)
       this._drawFrame(frame)
     }
   }
@@ -230,12 +229,14 @@ class Spriteling {
 
       // Resolve animation script
       if (typeof animationObject === 'object') {
-        if (typeof animationObject.script === 'string') {
-          animationObject.script = this._internal.animations[animationObject.script]
+        const scriptName = animationObject.script
+        if (typeof scriptName === 'string') {
+          animationObject.script = this._internal.animations[scriptName]
         }
-        if (typeof animationObject.script === 'undefined') {
+        if (typeof scriptName === 'undefined') {
           animationObject.script = this._internal.animations['all']
         }
+        this._log('info', `playing animation "${scriptName}"`)
         this._playhead = Object.assign({}, this.animationDefaults, animationObject)
       }
 
@@ -254,9 +255,9 @@ class Spriteling {
     }
 
     // onPlay callback
-    // if (typeof this._playhead.onPlay === 'function') {
-    //   this._.playhead.onPlay.call($element.data('spriteAnimator'))
-    // }
+    if (typeof this._playhead.onPlay === 'function') {
+      this._.playhead.onPlay()
+    }
   }
 
   /**
@@ -273,9 +274,9 @@ class Spriteling {
     this._playhead.play = false
 
     // onStop callback
-    // if (typeof plugin.playhead.onStop === 'function') {
-    //   plugin.playhead.onStop.call($element.data('spriteAnimator'));
-    // }
+    if (typeof this._playhead.onStop === 'function') {
+      this._playhead.onStop();
+    }
   }
 
   /**
@@ -296,7 +297,7 @@ class Spriteling {
       if (this._internal.loaded) { return } // <- Fix for some unexplained firefox bug that loads this twice.
       this._internal.loaded = true
 
-      this._log('info', 'Loaded: ' + this._options.url + ', sprites ' + this._options.cols + ' x ' + this._options.rows)
+      this._log('info', 'loaded: ' + this._options.url + ', sprites ' + this._options.cols + ' x ' + this._options.rows)
 
       this._internal.sheetWidth = _preload.width
       this._internal.sheetHeight = _preload.height
@@ -352,9 +353,9 @@ class Spriteling {
       }
 
       // onLoaded callback
-      // if (typeof this._options.onLoaded === 'function') {
-      //   this._options.onLoaded.call($element.data('spriteAnimator'))
-      // }
+      if (typeof this._options.onLoaded === 'function') {
+        this._options.onLoaded()
+      }
     })
   }
 
@@ -375,8 +376,6 @@ class Spriteling {
   _loop = (time) => {
     // Should be called as soon as possible
     const requestFrameId = raf(this._loop)
-
-    //console.log(requestFrameId);
 
     // Wait until fully loaded
     if (this._element !== null && this._internal.loaded) {
@@ -406,7 +405,7 @@ class Spriteling {
               this._playhead.nextDelay /= this._playhead.tempo
               this._playhead.lastTime = time
 
-              // this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' + this._playhead.nextDelay + ', run: ' + this._playhead.run)
+              this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' + this._playhead.nextDelay + ', run: ' + this._playhead.run)
             }
 
           } else {
@@ -459,9 +458,9 @@ class Spriteling {
     }
 
     // onFrame callback
-    // if (typeof this._playhead.onFrame === 'function') {
-    //   this._playhead.onFrame.call($element.data('spriteAnimator'))
-    // }
+    if (typeof this._playhead.onFrame === 'function') {
+      this._playhead.onFrame()
+    }
   }
 
   /**
@@ -471,6 +470,7 @@ class Spriteling {
    * @private
    */
   _log = (level, message) => {
+    if (level === 'info' && !this._options.debug) return
     console[level](`SpriteLing: ${message}`)
   }
 }
