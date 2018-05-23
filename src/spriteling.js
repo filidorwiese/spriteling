@@ -1,5 +1,5 @@
-const imageLoaded = require('image-loaded')
-const raf = require('raf')
+import imageLoaded from 'image-loaded'
+import raf from 'raf'
 
 class Spriteling {
   spriteDefaults = {
@@ -103,7 +103,7 @@ class Spriteling {
   /**
    * Show certain sprite (circumvents the current animation sequence)
    */
-  showSprite (spriteNumber) {
+  showSprite = (spriteNumber) => {
     this._playhead.play = false
     this._drawFrame({sprite: spriteNumber})
   }
@@ -111,7 +111,7 @@ class Spriteling {
   /**
    * Get the current spriteNumber that is shown
    */
-  currentSprite () {
+  currentSprite = () => {
     return this._playhead.currentSprite
   }
 
@@ -124,26 +124,26 @@ class Spriteling {
    *          - delay: alternate delay then the default delay
    *          - top/left/bottom/right: reposition the placeholder
    */
-  addScript (name, script) {
+  addScript = (name, script) => {
     // TODO: type validation
     this._internal.animations[name] = script
   }
 
-  setTempo (tempo) {
+  setTempo = (tempo) => {
     this._playhead.tempo = tempo
   }
 
   /**
    * Get the current frame
    */
-  current () {
+  current = () => {
     return this._playhead.currentFrame
   }
 
   /**
    * Go forward one frame
    */
-  next () {
+  next = () => {
     if (!this._internal.loaded) { return false }
 
     // Update counter
@@ -162,7 +162,7 @@ class Spriteling {
   /**
    * Go back one frame
    */
-  previous () {
+  previous = () => {
     if (!this._internal.loaded) { return false }
 
     // Update counter
@@ -183,7 +183,7 @@ class Spriteling {
    * @param frameNumber [integer]
    * @returns {boolean}
    */
-  goTo (frameNumber) {
+  goTo = (frameNumber) => {
     if (!this._internal.loaded) { return false }
 
     // Make sure given framenumber is within the animation
@@ -194,7 +194,7 @@ class Spriteling {
     this._playhead.currentFrame = frameNumber
     const frame = this._playhead.script[this._playhead.currentFrame]
     if (frame !== undefined) {
-      this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite)
+      // this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite)
       this._drawFrame(frame)
     }
   }
@@ -213,10 +213,10 @@ class Spriteling {
    *              - onPlay/onStop/onFrame: callbacks called at the appropriate times (default: null)
    *          if not set, we resume the current animation or start the 'all' built-in animation sequence
    */
-  play (animationObject) {
+  play = (animationObject) => {
     // Not yet loaded, wait...
     if (!this._internal.loaded) {
-      setTimeout(() => { this._play(animationObject) }, 50)
+      setTimeout(() => { this.play(animationObject) }, 50)
       return false
     }
 
@@ -250,14 +250,14 @@ class Spriteling {
   /**
    * Reverse direction of play
    */
-  reverse () {
+  reverse = () => {
     this._playhead.reversed = !this._playhead.reversed
   }
 
   /**
    * Stop the animation
    */
-  stop () {
+  stop = () => {
     this._playhead.play = false
 
     // onStop callback
@@ -269,14 +269,14 @@ class Spriteling {
   /**
    * Reset playhead to first frame
    */
-  reset () {
+  reset = () => {
     this.goTo(0)
   }
 
   /**
    * Load the spritesheet and position it correctly
    */
-  _load () {
+  _load = () => {
     const _preload = new Image()
     _preload.src = this._options.url
 
@@ -299,38 +299,33 @@ class Spriteling {
         this._log('error', 'frameHeight ' + this._internal.frameHeight + ' is not a whole number')
       }
 
-      this._element.setAttribute('style', `
-        position: absolute;
-        width: ${this._internal.frameWidth};
-        height: ${this._internal.frameHeight};
-        background-image: 'url(${this._options.url})';
-        background-position: '0 0';
-      `)
+      this._element.style.position = 'absolute'
+      this._element.style.width = `${this._internal.frameWidth}px`
+      this._element.style.height = `${this._internal.frameHeight}px`
+      this._element.style.backgroundImage = `url(${this._options.url})`
+      this._element.style.backgroundPosition = '0 0'
 
       if (this._options.top !== null) {
         if (this._options.top === 'center') {
-          this._element.setAttribute('style', `
-            top: 50%;
-            margin-top: ${this._internal.frameHeight / 2 * -1};
-          `)
+
+          this._element.style.top = '50%'
+          this._element.style.marginTop = `${this._internal.frameHeight / 2 * -1}px`
         } else {
-          this._element.setAttribute('style', `top: ${this._options.top};`)
+          this._element.style.top = `${this._options.top}px`
         }
       }
       if (this._options.right !== null) {
-        this._element.setAttribute('style', `right: ${this._options.right};`)
+        this._element.style.right = `${this._options.right}px`
       }
       if (this._options.bottom !== null) {
-        this._element.setAttribute('style', `bottom: ${this._options.bottom};`)
+        this._element.style.bottom = `${this._options.bottom}px`
       }
       if (this._options.left !== null) {
         if (this._options.left === 'center') {
-          this._element.setAttribute('style', `
-            left: ${this._options.left};
-            margin-left: ${this._internal.frameWidth / 2 * -1};
-          `)
+          this._element.style.left = `${this._options.left}px`
+          this._element.style.marginLeft = `${this._internal.frameWidth / 2 * -1}px`
         } else {
-          this._element.setAttribute('style', `left: ${this._options.left};`)
+          this._element.style.left = `${this._options.left}px`
         }
       }
 
@@ -354,7 +349,7 @@ class Spriteling {
   /**
    * Generate a linear script based on the spritesheet itself
    */
-  _autoScript () {
+  _autoScript = () => {
     const script = []
     for (let i = 0; i < this._internal.totalSprites; i++) {
       script[i] = {sprite: (i + 1)}
@@ -399,7 +394,7 @@ class Spriteling {
               this._playhead.nextDelay /= this._playhead.tempo
               this._playhead.lastTime = time
 
-              this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' + this._playhead.nextDelay + ', run: ' + this._playhead.run)
+              // this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' + this._playhead.nextDelay + ', run: ' + this._playhead.run)
             }
 
           } else {
@@ -420,7 +415,7 @@ class Spriteling {
   /**
    * Draw a single frame
    */
-  _drawFrame (frame) {
+  _drawFrame = (frame) => {
     if (frame.sprite === this._playhead.currentSprite) { return false }
     this._playhead.currentSprite = frame.sprite
 
@@ -434,21 +429,21 @@ class Spriteling {
     }
 
     // Animate background
-    this._element.setAttribute('style', `background-position: ${bgX}px ${bgY}px;`)
+    this._element.style.backgroundPosition = `${bgX}px ${bgY}px`
     const rect = this._element.getBoundingClientRect()
 
     // Move if indicated
     if (frame.top) {
-      this._element.setAttribute('style', `top: ${rect.top + frame.top}px;`)
+      this._element.style.top = `${rect.top + frame.top}px`
     }
     if (frame.right) {
-      this._element.setAttribute('style', `right: ${rect.right + frame.right}px;`)
+      this._element.style.top = `${rect.right + frame.right}px`
     }
     if (frame.bottom) {
-      this._element.setAttribute('style', `bottom: ${rect.bottom + frame.bottom}px;`)
+      this._element.style.top = `${rect.bottom + frame.bottom}px`
     }
     if (frame.left) {
-      this._element.setAttribute('style', `left: ${rect.left + frame.left}px;`)
+      this._element.style.top = `${rect.left + frame.left}px`
     }
 
     // onFrame callback
@@ -463,7 +458,7 @@ class Spriteling {
    * @param message
    * @private
    */
-  _log (level, message) {
+  _log = (level, message) => {
     console[level](`SpriteLing: ${message}`)
   }
 }
