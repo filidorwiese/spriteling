@@ -1,9 +1,9 @@
+import typescript from 'rollup-plugin-typescript';
 import resolve from 'rollup-plugin-node-resolve'
-import babel from 'rollup-plugin-babel'
 import commonjs from 'rollup-plugin-commonjs'
 
 export default {
-  input: 'src/spriteling.js',
+  input: 'src/spriteling.ts',
   output: {
     file: 'dist/spriteling.min.js',
     name: 'SpriteLing',
@@ -11,9 +11,7 @@ export default {
   },
   plugins: [
     resolve(),
-    babel({
-      exclude: 'node_modules/**'
-    }),
-    commonjs(),
+    typescript(),
+    commonjs()
   ]
 }
