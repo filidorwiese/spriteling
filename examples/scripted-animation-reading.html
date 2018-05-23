@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="./spriteling.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+    <link href="./screen.css" rel="stylesheet" />
+</head>
+<body>
+
+<div class="main">
+    <p>
+        <button id="play">play</button>
+        <button id="stop">stop</button>
+        <button id="reset">reset</button>
+        <button id="next">next</button>
+        <button id="previous">previous</button>
+        <button id="reverse">reverse</button>
+    </p>
+    <p>
+        <label>Frame: </label><input type="text" size="5" id="framenumber" value="0" />
+        <button id="goTo">goTo</button>
+        <label>Tempo: </label><input type="text" size="5" id="tempo" value="1" />
+        <button id="setTempo">setTempo</button>
+    </p>
+    <div id="sprite"></div>
+</div>
+
+<script>
+  var sprite = new SpriteLing({
+    debug: true,
+    url: './sprites/reading.png',
+    top: 200,
+    left: 100,
+    cols: 5,
+    rows: 3
+  }, '#sprite')
+
+  sprite.addScript('read', [
+    // read lines
+    {sprite: 1, delay: 1000},
+    {sprite: 2, delay: 800},
+    {sprite: 1},
+    {sprite: 3, delay: 400},
+    {sprite: 1},
+
+    // read lines
+    {sprite: 2, delay: 800},
+    {sprite: 1},
+    {sprite: 3, delay: 400},
+    {sprite: 1},
+
+    // read lines
+    {sprite: 2, delay: 400},
+    {sprite: 1},
+    {sprite: 3, delay: 800},
+    {sprite: 1},
+
+    // blink
+    {sprite: 4},
+    {sprite: 1},
+
+    // turn page
+    {sprite: 5},
+    {sprite: 6},
+    {sprite: 7},
+    {sprite: 8},
+    {sprite: 9},
+    {sprite: 10},
+    {sprite: 11},
+    {sprite: 12}
+  ])
+
+  sprite.play({
+    run: 1,
+    delay: 200,
+    script: 'read'
+  })
+
+  document.querySelector('#play').addEventListener('click', function () {
+    sprite.play()
+  })
+  document.querySelector('#stop').addEventListener('click', function () {
+    sprite.stop()
+  })
+  document.querySelector('#reset').addEventListener('click', function () {
+    sprite.reset()
+  })
+  document.querySelector('#next').addEventListener('click', function () {
+    sprite.next()
+  })
+  document.querySelector('#previous').addEventListener('click', function () {
+    sprite.previous()
+  })
+  document.querySelector('#reverse').addEventListener('click', function () {
+    sprite.reverse()
+  })
+  document.querySelector('#goTo').addEventListener('click', function () {
+    var frameNumber = document.getElementById('framenumber').value || 0
+    sprite.goTo(frameNumber)
+  })
+  document.querySelector('#setTempo').addEventListener('click', function () {
+    var tempo = document.getElementById('tempo').value || 1
+    sprite.setTempo(tempo)
+  })
+</script>
+
+</body>
+</html>

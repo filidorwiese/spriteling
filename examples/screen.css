@@ -1,0 +1,22 @@
+
+body, html {
+    font-family: 'Karla', sans-serif;
+    font-size: 18px;
+    margin: 0;
+    padding: 0;
+}
+
+button, input {
+    font-family: 'Karla', sans-serif;
+    font-size: 18px;
+    padding: 5px;
+    margin-right: 5px;
+}
+
+.main {
+    padding: 10px;
+}
+
+p {
+    margin: 15px;
+}
