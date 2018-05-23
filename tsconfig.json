@@ -1,9 +1,11 @@
 {
-  "extends": "tslint:recommended",
-  "rules": {
-    "semicolon": [true, "never"],
-    "indent": [true, "spaces", 2]
+  "compilerOptions": {
+    "target": "es2017",
+    "moduleResolution": "node",
+    "outDir": "build/compiled",
+    "declaration": true
   },
-  "jsRules": { },
-  "rulesDirectory": [ ]
+  "include": [
+    "src"
+  ]
 }

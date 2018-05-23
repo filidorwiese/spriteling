@@ -71,10 +71,9 @@
     {sprite: 12}
   ])
 
-  sprite.play({
+  sprite.play('read', {
     run: 1,
-    delay: 200,
-    script: 'read'
+    delay: 200
   })
 
   document.querySelector('#play').addEventListener('click', function () {

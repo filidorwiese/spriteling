@@ -1,39 +1,9 @@
 import imageLoaded from 'image-loaded'
 import raf from 'raf'
-
-type SpriteSheet = {
-    debug: boolean,
-    url: string,
-    cols: number,
-    rows: number,
-    cutOffFrames: number,
-    top: number,
-    bottom: number,
-    left: number,
-    right: number,
-    startSprite: number,
-    onLoaded: () => void
-}
-
-type Animation = {
-    play: boolean,
-    delay: number,
-    tempo: number,
-    run: number,
-    reversed: boolean,
-    outOfViewStop: boolean,
-    script: Array<{ script: number}>,
-    lastTime: number,
-    nextDelay: number,
-    currentFrame: number,
-    currentSprite: number,
-    onPlay: () => void,
-    onStop: () => void,
-    onFrame: () => void
-}
+import {Animation, Frame, Internal, SpriteSheet} from './types'
 
 class Spriteling {
-  spriteSheetDefaults: SpriteSheet = {
+  private spriteSheetDefaults: SpriteSheet = {
     debug: false,
     url: null,
     cols: null,
@@ -47,7 +17,7 @@ class Spriteling {
     onLoaded: null
   }
 
-  animationDefaults: Animation = {
+  private animationDefaults: Animation = {
     play: true,
     delay: 50,
     tempo: 1,
@@ -64,7 +34,7 @@ class Spriteling {
     onFrame: null
   }
 
-  _internal = {
+  private internal: Internal = {
     loaded: false,
     totalSprites: 0,
     sheetWidth: 0,
@@ -74,11 +44,11 @@ class Spriteling {
     animations: {}
   }
 
-  _spriteSheet = {}
+  private spriteSheet: SpriteSheet
 
-  _playhead = {}
+  private playhead: Animation
 
-  _element = false
+  private readonly element: HTMLElement
 
   /**
    * @options: object to override global options with, the following properties can be set
@@ -93,54 +63,57 @@ class Spriteling {
    * @element: can be a css selector or DOM element or false (in which case a new div element will be created)
    */
 
-  constructor (options, element: boolean | undefined = false) {
+  constructor(options, element: HTMLElement | string) {
     // Lookup element by selector
     if (element) {
-      this._element = element instanceof Element ? element : document.querySelector(element)
-      if (!this._element || !this._element instanceof Element) {
-        this._log('warn', `element "${element}" not found, created new element instead`)
-      }
+      this.element = typeof element === 'string' ? document.querySelector(element) : element
     }
 
     // No element found, let's create one instead
-    if (!this._element) {
-      this._element = document.createElement('div')
-      document.body.appendChild(this._element)
+    if (!this.element) {
+      this.log('warn', `element "${element}" not found, created new element instead`)
+      this.element = document.createElement('div')
+      document.body.appendChild(this.element)
     }
 
     // Combine options with defaults
-    this._spriteSheet = Object.assign({}, this.spriteSheetDefaults, options)
+    this.spriteSheet = {...this.spriteSheetDefaults, ...options}
+    this.playhead = {...this.animationDefaults}
 
     // Initialize spritesheet
-    if (!options.cols) { this._log('error', 'options.cols not set') }
-    if (!options.rows) { this._log('error', 'options.rows not set') }
+    if (!options.cols) {
+      this.log('error', 'options.cols not set')
+    }
+    if (!options.rows) {
+      this.log('error', 'options.rows not set')
+    }
     if (!options.url) {
       // If no sprite is specified try to use background-image
-      const elementStyle = window.getComputedStyle(this._element)
+      const elementStyle = window.getComputedStyle(this.element)
       const cssBackgroundImage = elementStyle.getPropertyValue('background-image')
       if (cssBackgroundImage === 'none') {
-        this._log('error', 'no spritesheet image found, please specify it with options.url or set with css as background')
+        this.log('error', 'no spritesheet image found, please specify it with options.url or set as css background')
       } else {
-        this._spriteSheet.url = cssBackgroundImage.replace(/"/g, '').replace(/url\(|\)$/ig, '')
+        this.spriteSheet.url = cssBackgroundImage.replace(/"/g, '').replace(/url\(|\)$/ig, '')
       }
     }
 
-    this._loadSpriteSheet()
+    this.loadSpriteSheet()
   }
 
   /**
    * Show certain sprite (circumvents the current animation sequence)
    */
-  showSprite = (spriteNumber: number) => {
-    this._playhead.play = false
-    this._drawFrame({sprite: spriteNumber})
+  public showSprite = (spriteNumber: number) => {
+    this.playhead.play = false
+    this.drawFrame({sprite: spriteNumber})
   }
 
   /**
    * Get the current spriteNumber that is shown
    */
-  currentSprite = () => {
-    return this._playhead.currentSprite
+  public currentSprite = (): number => {
+    return this.playhead.currentSprite
   }
 
   /**
@@ -152,57 +125,61 @@ class Spriteling {
    *          - delay: alternate delay then the default delay
    *          - top/left/bottom/right: reposition the placeholder
    */
-  addScript = (name, script) => {
-    this._internal.animations[name] = script
+  public addScript = (name: string, script: Frame[]) => {
+    this.internal.animations[name] = script
   }
 
-  setTempo = (tempo) => {
-    this._playhead.tempo = tempo
+  public setTempo = (tempo: number) => {
+    this.playhead.tempo = tempo
   }
 
   /**
    * Get the current frame
    */
-  current = () => {
-    return this._playhead.currentFrame
+  public current = () => {
+    return this.playhead.currentFrame
   }
 
   /**
    * Go forward one frame
    */
-  next = () => {
-    if (!this._internal.loaded) { return false }
+  public next = () => {
+    if (!this.internal.loaded) {
+      return false
+    }
 
     // Update counter
-    this._playhead.currentFrame += 1
-    if (this._playhead.currentFrame > (this._playhead.script.length - 1)) {
-      this._playhead.currentFrame = 0
+    this.playhead.currentFrame += 1
+    if (this.playhead.currentFrame > (this.playhead.script.length - 1)) {
+      this.playhead.currentFrame = 0
     }
-    if (this._playhead.currentFrame === this._playhead.script.length - 1) {
-      this._playhead.run -= 1
+    if (this.playhead.currentFrame === this.playhead.script.length - 1) {
+      this.playhead.run -= 1
     }
 
-    const frame = this._playhead.script[this._playhead.currentFrame]
-    this._drawFrame(frame)
+    const frame = this.playhead.script[this.playhead.currentFrame]
+    this.drawFrame(frame)
   }
 
   /**
    * Go back one frame
    */
-  previous = () => {
-    if (!this._internal.loaded) { return false }
+  public previous = () => {
+    if (!this.internal.loaded) {
+      return false
+    }
 
     // Update counter
-    this._playhead.currentFrame -= 1
-    if (this._playhead.currentFrame < 0) {
-      this._playhead.currentFrame = (this._playhead.script.length - 1)
+    this.playhead.currentFrame -= 1
+    if (this.playhead.currentFrame < 0) {
+      this.playhead.currentFrame = (this.playhead.script.length - 1)
     }
-    if (this._playhead.currentFrame === 0) {
-      this._playhead.run -= 1
+    if (this.playhead.currentFrame === 0) {
+      this.playhead.run -= 1
     }
 
-    const frame = this._playhead.script[this._playhead.currentFrame]
-    this._drawFrame(frame)
+    const frame = this.playhead.script[this.playhead.currentFrame]
+    this.drawFrame(frame)
   }
 
   /**
@@ -210,19 +187,21 @@ class Spriteling {
    * @param frameNumber [integer]
    * @returns {boolean}
    */
-  goTo = (frameNumber) => {
-    if (!this._internal.loaded) { return false }
+  public goTo = (frameNumber: number) => {
+    if (!this.internal.loaded) {
+      return false
+    }
 
-    // Make sure given framenumber is within the animation
-    const _baseNumber = Math.floor(frameNumber / this._playhead.script.length)
-    frameNumber = Math.floor(frameNumber - (_baseNumber * this._playhead.script.length))
+    // Make sure given frame is within the animation
+    const baseNumber = Math.floor(frameNumber / this.playhead.script.length)
+    frameNumber = Math.floor(frameNumber - (baseNumber * this.playhead.script.length))
 
     // Draw frame
-    this._playhead.currentFrame = frameNumber
-    const frame = this._playhead.script[this._playhead.currentFrame]
+    this.playhead.currentFrame = frameNumber
+    const frame = this.playhead.script[this.playhead.currentFrame]
     if (frame !== undefined) {
-      this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite)
-      this._drawFrame(frame)
+      this.log('info', 'frame: ' + this.playhead.currentFrame + ', sprite: ' + frame.sprite)
+      this.drawFrame(frame)
     }
   }
 
@@ -240,152 +219,174 @@ class Spriteling {
    *              - onPlay/onStop/onFrame: callbacks called at the appropriate times (default: null)
    *          if not set, we resume the current animation or start the 'all' built-in animation sequence
    */
-  play = (scriptName, animationObject = {}) => {
+  public play = (scriptName?: string | Animation, animationObject?: Animation) => {
     // Not yet loaded, wait...
-    if (!this._internal.loaded) {
-      setTimeout(() => { this.play(scriptName, animationObject) }, 50)
+    if (!this.internal.loaded) {
+      setTimeout(() => {
+        this.play(scriptName, animationObject)
+      }, 50)
       return false
     }
 
-    if (scriptName) {
-      // Script provided
-      if (typeof scriptName === 'string') {
-        animationObject.script = scriptName
-      }
+    // play()
+    if (!scriptName && !animationObject) {
 
-      // No script provided
-      if (typeof scriptName === 'object') {
-        animationObject = scriptName
-      }
-
-      // Resolve animation script
-      if (typeof animationObject === 'object') {
-        const scriptName = animationObject.script
-        if (typeof scriptName === 'string') {
-          animationObject.script = this._internal.animations[scriptName]
+      // Play if not already playing
+      if (!this.playhead.play) {
+        if (this.playhead.run === 0) {
+          this.playhead.run = 1
         }
-        if (typeof scriptName === 'undefined') {
-          animationObject.script = this._internal.animations['all']
-        }
-        this._log('info', `playing animation "${scriptName}"`)
-        this._playhead = Object.assign({}, this.animationDefaults, animationObject)
+        this.playhead.play = true
+        // this.loop()
       }
 
     } else {
-      // Play if not already playing
-      if (!this._playhead.play) {
-        if (this._playhead.run === 0) { this._playhead.run = 1 }
-        this._playhead.play = true
-        this._loop()
+
+      // play('someAnimation')
+      if (typeof scriptName === 'string' && !animationObject) {
+        if (this.internal.animations[scriptName]) {
+          this.log('info', `playing animation "${scriptName}"`)
+          animationObject = {
+            ...this.animationDefaults,
+            ...{script: this.internal.animations[scriptName]}
+          }
+        } else {
+          this.log('error', `animation "${scriptName}" not found`)
+        }
+
+        // play('someAnimation', { options })
+      } else if (typeof scriptName === 'string' && typeof animationObject === 'object') {
+        animationObject.script = this.internal.animations[scriptName]
+
+        // play({ options })
+      } else if (typeof scriptName === 'object' && !animationObject) {
+        animationObject = scriptName
+
+      }
+
+      if (animationObject) {
+        if (typeof animationObject.script === 'undefined') {
+          this.log('info', `playing animation "all"`)
+        }
+
+        this.playhead = {
+          ...this.animationDefaults,
+          ...{script: this.internal.animations.all},
+          ...animationObject
+        }
       }
     }
 
     // Enter the animation loop
-    if (this._playhead.run !== 0) {
-      this._loop()
+    if (this.playhead.run !== 0) {
+      this.loop()
     }
 
     // onPlay callback
-    if (typeof this._playhead.onPlay === 'function') {
-      this._.playhead.onPlay()
+    if (typeof this.playhead.onPlay === 'function') {
+      this.playhead.onPlay()
     }
   }
 
   /**
    * Reverse direction of play
    */
-  reverse = () => {
-    this._playhead.reversed = !this._playhead.reversed
+  public reverse = () => {
+    this.playhead.reversed = !this.playhead.reversed
   }
 
   /**
    * Stop the animation
    */
-  stop = () => {
-    this._playhead.play = false
+  public stop = () => {
+    this.playhead.play = false
 
     // onStop callback
-    if (typeof this._playhead.onStop === 'function') {
-      this._playhead.onStop();
+    if (typeof this.playhead.onStop === 'function') {
+      this.playhead.onStop()
     }
   }
 
   /**
    * Reset playhead to first frame
    */
-  reset = () => {
+  public reset = () => {
     this.goTo(0)
   }
 
   /**
    * Load the spritesheet and position it correctly
    */
-  _loadSpriteSheet = () => {
-    const _preload = new Image()
-    _preload.src = this._spriteSheet.url
+  private loadSpriteSheet = () => {
+    const preload = new Image()
+    preload.src = this.spriteSheet.url
 
-    imageLoaded(_preload, () => {
-      if (this._internal.loaded) { return } // <- Fix for some unexplained firefox bug that loads this twice.
-      this._internal.loaded = true
-
-      this._log('info', 'loaded: ' + this._spriteSheet.url + ', sprites ' + this._spriteSheet.cols + ' x ' + this._spriteSheet.rows)
-
-      this._internal.sheetWidth = _preload.width
-      this._internal.sheetHeight = _preload.height
-      this._internal.frameWidth = parseInt(this._internal.sheetWidth / this._spriteSheet.cols, 10)
-      this._internal.frameHeight = parseInt(this._internal.sheetHeight / this._spriteSheet.rows, 10)
-      this._internal.totalSprites = (this._spriteSheet.cols * this._spriteSheet.rows) - this._spriteSheet.cutOffFrames
-
-      if (this._internal.frameWidth % 1 !== 0) {
-        this._log('error', 'frameWidth ' + this._internal.frameWidth + ' is not a whole number')
-      }
-      if (this._internal.frameHeight % 1 !== 0) {
-        this._log('error', 'frameHeight ' + this._internal.frameHeight + ' is not a whole number')
+    imageLoaded(preload, () => {
+      // <- Fix for some unexplained firefox bug that loads this twice.
+      if (this.internal.loaded) {
+        return
       }
 
-      this._element.style.position = 'absolute'
-      this._element.style.width = `${this._internal.frameWidth}px`
-      this._element.style.height = `${this._internal.frameHeight}px`
-      this._element.style.backgroundImage = `url(${this._spriteSheet.url})`
-      this._element.style.backgroundPosition = '0 0'
+      this.internal.loaded = true
 
-      if (this._spriteSheet.top !== null) {
-        if (this._spriteSheet.top === 'center') {
+      this.log('info', 'loaded: ' + this.spriteSheet.url + ', sprites ' + this.spriteSheet.cols + ' x ' +
+        this.spriteSheet.rows)
 
-          this._element.style.top = '50%'
-          this._element.style.marginTop = `${this._internal.frameHeight / 2 * -1}px`
+      this.internal.sheetWidth = preload.width
+      this.internal.sheetHeight = preload.height
+      this.internal.frameWidth = this.internal.sheetWidth / this.spriteSheet.cols
+      this.internal.frameHeight = this.internal.sheetHeight / this.spriteSheet.rows
+      this.internal.totalSprites = (this.spriteSheet.cols * this.spriteSheet.rows) - this.spriteSheet.cutOffFrames
+
+      if (this.internal.frameWidth % 1 !== 0) {
+        this.log('error', 'frameWidth ' + this.internal.frameWidth + ' is not a whole number')
+      }
+      if (this.internal.frameHeight % 1 !== 0) {
+        this.log('error', 'frameHeight ' + this.internal.frameHeight + ' is not a whole number')
+      }
+
+      this.element.style.position = 'absolute'
+      this.element.style.width = `${this.internal.frameWidth}px`
+      this.element.style.height = `${this.internal.frameHeight}px`
+      this.element.style.backgroundImage = `url(${this.spriteSheet.url})`
+      this.element.style.backgroundPosition = '0 0'
+
+      if (this.spriteSheet.top !== null) {
+        if (this.spriteSheet.top === 'center') {
+          this.element.style.top = '50%'
+          this.element.style.marginTop = `${this.internal.frameHeight / 2 * -1}px`
         } else {
-          this._element.style.top = `${this._spriteSheet.top}px`
+          this.element.style.top = `${this.spriteSheet.top}px`
         }
       }
-      if (this._spriteSheet.right !== null) {
-        this._element.style.right = `${this._spriteSheet.right}px`
+      if (this.spriteSheet.right !== null) {
+        this.element.style.right = `${this.spriteSheet.right}px`
       }
-      if (this._spriteSheet.bottom !== null) {
-        this._element.style.bottom = `${this._spriteSheet.bottom}px`
+      if (this.spriteSheet.bottom !== null) {
+        this.element.style.bottom = `${this.spriteSheet.bottom}px`
       }
-      if (this._spriteSheet.left !== null) {
-        if (this._spriteSheet.left === 'center') {
-          this._element.style.left = `${this._spriteSheet.left}px`
-          this._element.style.marginLeft = `${this._internal.frameWidth / 2 * -1}px`
+      if (this.spriteSheet.left !== null) {
+        if (this.spriteSheet.left === 'center') {
+          this.element.style.left = `${this.spriteSheet.left}px`
+          this.element.style.marginLeft = `${this.internal.frameWidth / 2 * -1}px`
         } else {
-          this._element.style.left = `${this._spriteSheet.left}px`
+          this.element.style.left = `${this.spriteSheet.left}px`
         }
       }
 
       // Auto script the first 'all' animation sequence and make it default
-      this._autoScript()
-      const animationObject = {script: this._internal.animations['all']}
-      this.playhead = Object.assign({}, this.animationDefaults, animationObject)
+      this.autoScript()
+      const animationObject = {script: this.internal.animations.all}
+      this.playhead = {...this.animationDefaults, ...animationObject}
 
       // Starting sprite?
-      if (this._spriteSheet.startSprite > 1 && this._spriteSheet.startSprite <= this._internal.totalSprites) {
-        this.showSprite(this._spriteSheet.startSprite)
+      if (this.spriteSheet.startSprite > 1 && this.spriteSheet.startSprite <= this.internal.totalSprites) {
+        this.showSprite(this.spriteSheet.startSprite)
       }
 
       // onLoaded callback
-      if (typeof this._spriteSheet.onLoaded === 'function') {
-        this._spriteSheet.onLoaded()
+      if (typeof this.spriteSheet.onLoaded === 'function') {
+        this.spriteSheet.onLoaded()
       }
     })
   }
@@ -393,9 +394,9 @@ class Spriteling {
   /**
    * Generate a linear script based on the spritesheet itself
    */
-  _autoScript = () => {
+  private autoScript = () => {
     const script = []
-    for (let i = 0; i < this._internal.totalSprites; i++) {
+    for (let i = 0; i < this.internal.totalSprites; i++) {
       script[i] = {sprite: (i + 1)}
     }
     this.addScript('all', script)
@@ -404,43 +405,44 @@ class Spriteling {
   /**
    * The animation loop
    */
-  _loop = (time) => {
+  private loop = (time?: number) => {
     // Should be called as soon as possible
-    const requestFrameId = raf(this._loop)
+    const requestFrameId = raf(this.loop)
 
     // Wait until fully loaded
-    if (this._element !== null && this._internal.loaded) {
+    if (this.element !== null && this.internal.loaded) {
 
       // Only play when not paused
-      if (this._playhead.play) {
+      if (this.playhead.play) {
 
         // Throttle on nextDelay
-        if ((time - this._playhead.lastTime) >= this._playhead.nextDelay) {
+        if ((time - this.playhead.lastTime) >= this.playhead.nextDelay) {
 
           // Render next frame only if element is visible and within viewport
-          if (this._element.offsetParent !== null) { // && _inViewport(this._element)
+          if (this.element.offsetParent !== null) { // && _inViewport(this.element)
 
             // Only play if run counter is still <> 0
-            if (this._playhead.run === 0) {
+            if (this.playhead.run === 0) {
               this.stop()
             } else {
 
-              if (this._playhead.reversed) {
+              if (this.playhead.reversed) {
                 this.previous()
               } else {
                 this.next()
               }
 
-              const frame = this._playhead.script[this._playhead.currentFrame]
-              this._playhead.nextDelay = (frame.delay ? frame.delay : this._playhead.delay)
-              this._playhead.nextDelay /= this._playhead.tempo
-              this._playhead.lastTime = time
+              const frame = this.playhead.script[this.playhead.currentFrame]
+              this.playhead.nextDelay = (frame.delay ? frame.delay : this.playhead.delay)
+              this.playhead.nextDelay /= this.playhead.tempo
+              this.playhead.lastTime = time
 
-              this._log('info', 'frame: ' + this._playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' + this._playhead.nextDelay + ', run: ' + this._playhead.run)
+              this.log('info', 'frame: ' + this.playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' +
+                this.playhead.nextDelay + ', run: ' + this.playhead.run)
             }
 
           } else {
-            if (this._playhead.outOfViewStop) {
+            if (this.playhead.outOfViewStop) {
               this.stop()
             }
           }
@@ -457,40 +459,42 @@ class Spriteling {
   /**
    * Draw a single frame
    */
-  _drawFrame = (frame) => {
-    if (frame.sprite === this._playhead.currentSprite) { return false }
-    this._playhead.currentSprite = frame.sprite
+  private drawFrame = (frame) => {
+    if (frame.sprite === this.playhead.currentSprite) {
+      return false
+    }
+    this.playhead.currentSprite = frame.sprite
 
-    const row = Math.ceil(frame.sprite / this._spriteSheet.cols)
-    const col = frame.sprite - ((row - 1) * this._spriteSheet.cols)
-    const bgX = ((col - 1) * this._internal.frameWidth) * -1
-    const bgY = ((row - 1) * this._internal.frameHeight) * -1
+    const row = Math.ceil(frame.sprite / this.spriteSheet.cols)
+    const col = frame.sprite - ((row - 1) * this.spriteSheet.cols)
+    const bgX = ((col - 1) * this.internal.frameWidth) * -1
+    const bgY = ((row - 1) * this.internal.frameHeight) * -1
 
-    if (row > this._spriteSheet.rows || col > this._spriteSheet.cols) {
-      this._log('error', `position ${frame.sprite} out of bound'`)
+    if (row > this.spriteSheet.rows || col > this.spriteSheet.cols) {
+      this.log('error', `position ${frame.sprite} out of bound'`)
     }
 
     // Animate background
-    this._element.style.backgroundPosition = `${bgX}px ${bgY}px`
-    const rect = this._element.getBoundingClientRect()
+    this.element.style.backgroundPosition = `${bgX}px ${bgY}px`
+    const rect = this.element.getBoundingClientRect()
 
     // Move if indicated
     if (frame.top) {
-      this._element.style.top = `${rect.top + frame.top}px`
+      this.element.style.top = `${rect.top + frame.top}px`
     }
     if (frame.right) {
-      this._element.style.top = `${rect.right + frame.right}px`
+      this.element.style.top = `${rect.right + frame.right}px`
     }
     if (frame.bottom) {
-      this._element.style.top = `${rect.bottom + frame.bottom}px`
+      this.element.style.top = `${rect.bottom + frame.bottom}px`
     }
     if (frame.left) {
-      this._element.style.top = `${rect.left + frame.left}px`
+      this.element.style.top = `${rect.left + frame.left}px`
     }
 
     // onFrame callback
-    if (typeof this._playhead.onFrame === 'function') {
-      this._playhead.onFrame()
+    if (typeof this.playhead.onFrame === 'function') {
+      this.playhead.onFrame()
     }
   }
 
@@ -500,8 +504,10 @@ class Spriteling {
    * @param message
    * @private
    */
-  _log = (level, message) => {
-    if (level === 'info' && !this._spriteSheet.debug) return
+  private log = (level, message) => {
+    if (level === 'info' && !this.spriteSheet.debug) {
+      return
+    }
     console[level](`SpriteLing: ${message}`)
   }
 }
