@@ -1,8 +1,39 @@
 import imageLoaded from 'image-loaded'
 import raf from 'raf'
 
+type SpriteSheet = {
+    debug: boolean,
+    url: string,
+    cols: number,
+    rows: number,
+    cutOffFrames: number,
+    top: number,
+    bottom: number,
+    left: number,
+    right: number,
+    startSprite: number,
+    onLoaded: () => void
+}
+
+type Animation = {
+    play: boolean,
+    delay: number,
+    tempo: number,
+    run: number,
+    reversed: boolean,
+    outOfViewStop: boolean,
+    script: Array<{ script: number}>,
+    lastTime: number,
+    nextDelay: number,
+    currentFrame: number,
+    currentSprite: number,
+    onPlay: () => void,
+    onStop: () => void,
+    onFrame: () => void
+}
+
 class Spriteling {
-  spriteDefaults = {
+  spriteSheetDefaults: SpriteSheet = {
     debug: false,
     url: null,
     cols: null,
@@ -16,7 +47,7 @@ class Spriteling {
     onLoaded: null
   }
 
-  animationDefaults = {
+  animationDefaults: Animation = {
     play: true,
     delay: 50,
     tempo: 1,
@@ -43,7 +74,7 @@ class Spriteling {
     animations: {}
   }
 
-  _options = {}
+  _spriteSheet = {}
 
   _playhead = {}
 
@@ -62,7 +93,7 @@ class Spriteling {
    * @element: can be a css selector or DOM element or false (in which case a new div element will be created)
    */
 
-  constructor (options, element = false) {
+  constructor (options, element: boolean | undefined = false) {
     // Lookup element by selector
     if (element) {
       this._element = element instanceof Element ? element : document.querySelector(element)
@@ -78,7 +109,7 @@ class Spriteling {
     }
 
     // Combine options with defaults
-    this._options = Object.assign({}, this.spriteDefaults, options)
+    this._spriteSheet = Object.assign({}, this.spriteSheetDefaults, options)
 
     // Initialize spritesheet
     if (!options.cols) { this._log('error', 'options.cols not set') }
@@ -90,7 +121,7 @@ class Spriteling {
       if (cssBackgroundImage === 'none') {
         this._log('error', 'no spritesheet image found, please specify it with options.url or set with css as background')
       } else {
-        this._options.url = cssBackgroundImage.replace(/"/g, '').replace(/url\(|\)$/ig, '')
+        this._spriteSheet.url = cssBackgroundImage.replace(/"/g, '').replace(/url\(|\)$/ig, '')
       }
     }
 
@@ -100,7 +131,7 @@ class Spriteling {
   /**
    * Show certain sprite (circumvents the current animation sequence)
    */
-  showSprite = (spriteNumber) => {
+  showSprite = (spriteNumber: number) => {
     this._playhead.play = false
     this._drawFrame({sprite: spriteNumber})
   }
@@ -291,19 +322,19 @@ class Spriteling {
    */
   _loadSpriteSheet = () => {
     const _preload = new Image()
-    _preload.src = this._options.url
+    _preload.src = this._spriteSheet.url
 
     imageLoaded(_preload, () => {
       if (this._internal.loaded) { return } // <- Fix for some unexplained firefox bug that loads this twice.
       this._internal.loaded = true
 
-      this._log('info', 'loaded: ' + this._options.url + ', sprites ' + this._options.cols + ' x ' + this._options.rows)
+      this._log('info', 'loaded: ' + this._spriteSheet.url + ', sprites ' + this._spriteSheet.cols + ' x ' + this._spriteSheet.rows)
 
       this._internal.sheetWidth = _preload.width
       this._internal.sheetHeight = _preload.height
-      this._internal.frameWidth = parseInt(this._internal.sheetWidth / this._options.cols, 10)
-      this._internal.frameHeight = parseInt(this._internal.sheetHeight / this._options.rows, 10)
-      this._internal.totalSprites = (this._options.cols * this._options.rows) - this._options.cutOffFrames
+      this._internal.frameWidth = parseInt(this._internal.sheetWidth / this._spriteSheet.cols, 10)
+      this._internal.frameHeight = parseInt(this._internal.sheetHeight / this._spriteSheet.rows, 10)
+      this._internal.totalSprites = (this._spriteSheet.cols * this._spriteSheet.rows) - this._spriteSheet.cutOffFrames
 
       if (this._internal.frameWidth % 1 !== 0) {
         this._log('error', 'frameWidth ' + this._internal.frameWidth + ' is not a whole number')
@@ -315,30 +346,30 @@ class Spriteling {
       this._element.style.position = 'absolute'
       this._element.style.width = `${this._internal.frameWidth}px`
       this._element.style.height = `${this._internal.frameHeight}px`
-      this._element.style.backgroundImage = `url(${this._options.url})`
+      this._element.style.backgroundImage = `url(${this._spriteSheet.url})`
       this._element.style.backgroundPosition = '0 0'
 
-      if (this._options.top !== null) {
-        if (this._options.top === 'center') {
+      if (this._spriteSheet.top !== null) {
+        if (this._spriteSheet.top === 'center') {
 
           this._element.style.top = '50%'
           this._element.style.marginTop = `${this._internal.frameHeight / 2 * -1}px`
         } else {
-          this._element.style.top = `${this._options.top}px`
+          this._element.style.top = `${this._spriteSheet.top}px`
         }
       }
-      if (this._options.right !== null) {
-        this._element.style.right = `${this._options.right}px`
+      if (this._spriteSheet.right !== null) {
+        this._element.style.right = `${this._spriteSheet.right}px`
       }
-      if (this._options.bottom !== null) {
-        this._element.style.bottom = `${this._options.bottom}px`
+      if (this._spriteSheet.bottom !== null) {
+        this._element.style.bottom = `${this._spriteSheet.bottom}px`
       }
-      if (this._options.left !== null) {
-        if (this._options.left === 'center') {
-          this._element.style.left = `${this._options.left}px`
+      if (this._spriteSheet.left !== null) {
+        if (this._spriteSheet.left === 'center') {
+          this._element.style.left = `${this._spriteSheet.left}px`
           this._element.style.marginLeft = `${this._internal.frameWidth / 2 * -1}px`
         } else {
-          this._element.style.left = `${this._options.left}px`
+          this._element.style.left = `${this._spriteSheet.left}px`
         }
       }
 
@@ -348,13 +379,13 @@ class Spriteling {
       this.playhead = Object.assign({}, this.animationDefaults, animationObject)
 
       // Starting sprite?
-      if (this._options.startSprite > 1 && this._options.startSprite <= this._internal.totalSprites) {
-        this.showSprite(this._options.startSprite)
+      if (this._spriteSheet.startSprite > 1 && this._spriteSheet.startSprite <= this._internal.totalSprites) {
+        this.showSprite(this._spriteSheet.startSprite)
       }
 
       // onLoaded callback
-      if (typeof this._options.onLoaded === 'function') {
-        this._options.onLoaded()
+      if (typeof this._spriteSheet.onLoaded === 'function') {
+        this._spriteSheet.onLoaded()
       }
     })
   }
@@ -430,12 +461,12 @@ class Spriteling {
     if (frame.sprite === this._playhead.currentSprite) { return false }
     this._playhead.currentSprite = frame.sprite
 
-    const row = Math.ceil(frame.sprite / this._options.cols)
-    const col = frame.sprite - ((row - 1) * this._options.cols)
+    const row = Math.ceil(frame.sprite / this._spriteSheet.cols)
+    const col = frame.sprite - ((row - 1) * this._spriteSheet.cols)
     const bgX = ((col - 1) * this._internal.frameWidth) * -1
     const bgY = ((row - 1) * this._internal.frameHeight) * -1
 
-    if (row > this._options.rows || col > this._options.cols) {
+    if (row > this._spriteSheet.rows || col > this._spriteSheet.cols) {
       this._log('error', `position ${frame.sprite} out of bound'`)
     }
 
@@ -470,7 +501,7 @@ class Spriteling {
    * @private
    */
   _log = (level, message) => {
-    if (level === 'info' && !this._options.debug) return
+    if (level === 'info' && !this._spriteSheet.debug) return
     console[level](`SpriteLing: ${message}`)
   }
 }
