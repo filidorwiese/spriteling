@@ -1,1 +1,11 @@
 First version in the make
+
+TODO:
+* event bus
+* callbacks
+* fix loop?
+* conver to stypescript?
+* jsdoc
+* debug logging
+* cross-browser testing
+* cleanup

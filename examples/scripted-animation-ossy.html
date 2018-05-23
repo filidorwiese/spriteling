@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="./spriteling.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+    <link href="./screen.css" rel="stylesheet" />
+</head>
+<body>
+
+<div class="main">
+    <p>
+        <button id="look-around">Look around</button>
+        <button id="wiggle">Wiggle</button>
+        <button id="paw">Paw</button>
+        <button id="lay-down">Lay down</button>
+        <button id="stand-up">Stand up</button>
+    </p>
+    <div id="sprite"></div>
+</div>
+
+<script>
+  var sprite = new SpriteLing({
+    debug: true,
+    url: './sprites/ossy.png',
+    top: 200,
+    left: 100,
+    cols: 6,
+    rows: 4
+  }, '#sprite')
+
+  sprite.addScript('paw', [
+    {sprite: 22, delay: 100},
+    {sprite: 23, delay: 100},
+    {sprite: 24, delay: 3000},
+    {sprite: 23, delay: 100}
+  ])
+
+  sprite.addScript('wiggle', [
+    {sprite: 11},
+    {sprite: 12},
+    {sprite: 13},
+    {sprite: 14},
+    {sprite: 13},
+    {sprite: 12},
+    {sprite: 11},
+    {sprite: 10},
+    {sprite: 11},
+    {sprite: 12},
+    {sprite: 13},
+    {sprite: 14},
+    {sprite: 13},
+    {sprite: 12},
+    {sprite: 11},
+    {sprite: 10}
+  ])
+
+  sprite.addScript('lay-down', [
+    {sprite: 10},
+    {sprite: 9},
+    {sprite: 8},
+    {sprite: 7},
+    {sprite: 6},
+    {sprite: 5},
+    {sprite: 4},
+    {sprite: 3},
+    {sprite: 2, delay: 3000},
+    {sprite: 1}
+  ])
+
+  sprite.addScript('stand-up', [
+    {sprite: 1, delay: 2000},
+    {sprite: 2, delay: 1000},
+    {sprite: 1},
+    {sprite: 2, delay: 1000},
+    {sprite: 3},
+    {sprite: 4, delay: 1000},
+    {sprite: 5},
+    {sprite: 6},
+    {sprite: 7},
+    {sprite: 8},
+    {sprite: 9},
+    {sprite: 10, delay: 1000}
+  ])
+
+  sprite.addScript('look-around', [
+    {sprite: 10},
+    {sprite: 16},
+    {sprite: 17, delay: 1000},
+    {sprite: 16},
+    {sprite: 10},
+    {sprite: 18},
+    {sprite: 19},
+    {sprite: 20},
+    {sprite: 21, delay: 1000},
+    {sprite: 20},
+    {sprite: 19},
+    {sprite: 18},
+    {sprite: 10}
+  ])
+
+  sprite.addScript('blink', [
+    {sprite: 10, delay: 5000},
+    {sprite: 15, delay: 350}
+  ])
+
+  // Default state
+  sprite.play('blink')
+
+  // Buttons
+  document.querySelector('#look-around').addEventListener('click', function () {
+    new Log('Ossy: look-around')
+    sprite.play('look-around', {
+      run: 1,
+      delay: 100,
+      onStop: function () {
+        new Log('Ossy: done look-around')
+        sprite.play('blink')
+      }
+    })
+  })
+
+  document.querySelector('#wiggle').addEventListener('click', function () {
+    new Log('Ossy: wiggle')
+    sprite.play('wiggle', {
+      run: 1,
+      delay: 100,
+      onStop: function () {
+        new Log('Ossy: done wiggle')
+        sprite.play('blink')
+      }
+    })
+  })
+
+  document.querySelector('#paw').addEventListener('click', function () {
+    new Log('Ossy: paw')
+    sprite.play('paw', {
+      run: 1,
+      delay: 100,
+      onStop: function () {
+        new Log('Ossy: done paw')
+        sprite.play('blink')
+      }
+    })
+  })
+
+  document.querySelector('#lay-down').addEventListener('click', function () {
+    new Log('Ossy: lay-down')
+    sprite.play('lay-down', {
+      run: 1,
+      delay: 100,
+      onStop: function () {
+        new Log('Ossy: done lay-down')
+        sprite.play('blink')
+      }
+    })
+  })
+
+  document.querySelector('#stand-up').addEventListener('click', function () {
+    new Log('Ossy: stand-up')
+    sprite.play('stand-up', {
+      run: 1,
+      delay: 100,
+      onStop: function () {
+        new Log('Ossy: done stand-up')
+        sprite.play('blink')
+      }
+    })
+  })
+
+  // Utility log function
+  function Log (logline) {
+    if (typeof console !== 'undefined') {
+      console.log(logline)
+    }
+  }
+</script>
+
+</body>
+</html>

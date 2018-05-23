@@ -95,9 +95,7 @@ class Spriteling {
       }
     }
 
-    this._load()
-    console.log(this._options.url)
-    console.log('@', element, this._element)
+    this._loadSpriteSheet()
   }
 
   /**
@@ -125,7 +123,6 @@ class Spriteling {
    *          - top/left/bottom/right: reposition the placeholder
    */
   addScript = (name, script) => {
-    // TODO: type validation
     this._internal.animations[name] = script
   }
 
@@ -213,22 +210,37 @@ class Spriteling {
    *              - onPlay/onStop/onFrame: callbacks called at the appropriate times (default: null)
    *          if not set, we resume the current animation or start the 'all' built-in animation sequence
    */
-  play = (animationObject) => {
+  play = (scriptName, animationObject = {}) => {
     // Not yet loaded, wait...
     if (!this._internal.loaded) {
-      setTimeout(() => { this.play(animationObject) }, 50)
+      setTimeout(() => { this.play(scriptName, animationObject) }, 50)
       return false
     }
 
-    if (typeof animationObject === 'object') {
-      if (typeof animationObject.script === 'string') { // Resolve to stored animation sequence
-        animationObject.script = this._internal.animations[animationObject.script]
+    if (scriptName) {
+      // Script provided
+      if (typeof scriptName === 'string') {
+        animationObject.script = scriptName
       }
-      if (typeof animationObject.script === 'undefined') {
-        animationObject.script = this._internal.animations['all']
+
+      // No script provided
+      if (typeof scriptName === 'object') {
+        animationObject = scriptName
       }
-      this._playhead = Object.assign({}, this.animationDefaults, animationObject)
+
+      // Resolve animation script
+      if (typeof animationObject === 'object') {
+        if (typeof animationObject.script === 'string') {
+          animationObject.script = this._internal.animations[animationObject.script]
+        }
+        if (typeof animationObject.script === 'undefined') {
+          animationObject.script = this._internal.animations['all']
+        }
+        this._playhead = Object.assign({}, this.animationDefaults, animationObject)
+      }
+
     } else {
+      // Play if not already playing
       if (!this._playhead.play) {
         if (this._playhead.run === 0) { this._playhead.run = 1 }
         this._playhead.play = true
@@ -242,9 +254,9 @@ class Spriteling {
     }
 
     // onPlay callback
-    if (typeof this._playhead.onPlay === 'function') {
-      this._.playhead.onPlay.call($element.data('spriteAnimator'))
-    }
+    // if (typeof this._playhead.onPlay === 'function') {
+    //   this._.playhead.onPlay.call($element.data('spriteAnimator'))
+    // }
   }
 
   /**
@@ -276,7 +288,7 @@ class Spriteling {
   /**
    * Load the spritesheet and position it correctly
    */
-  _load = () => {
+  _loadSpriteSheet = () => {
     const _preload = new Image()
     _preload.src = this._options.url
 
