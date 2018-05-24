@@ -6,7 +6,7 @@
   "scripts": {
     "develop": "rollup -w -c",
     "build": "rollup -c",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "postversion": "git push --follow-tags"
   },
   "repository": {
     "type": "git",
