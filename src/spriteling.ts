@@ -133,11 +133,8 @@ class Spriteling {
     this.playhead.tempo = tempo
   }
 
-  /**
-   * Get the current frame
-   */
-  public current = () => {
-    return this.playhead.currentFrame
+  public getTempo = (): number => {
+    return this.playhead.tempo
   }
 
   /**
@@ -289,10 +286,24 @@ class Spriteling {
   }
 
   /**
+   * Get the current play state
+   */
+  public isPlaying = (): boolean => {
+    return this.playhead.play
+  }
+
+  /**
    * Reverse direction of play
    */
   public reverse = () => {
     this.playhead.reversed = !this.playhead.reversed
+  }
+
+  /**
+   * Get the current play state
+   */
+  public isReversed = (): boolean => {
+    return this.playhead.reversed
   }
 
   /**

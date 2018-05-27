@@ -38,10 +38,7 @@ declare class Spriteling {
      */
     addScript: (name: string, script: Frame[]) => void;
     setTempo: (tempo: number) => void;
-    /**
-     * Get the current frame
-     */
-    current: () => number;
+    getTempo: () => number;
     /**
      * Go forward one frame
      */
@@ -72,9 +69,17 @@ declare class Spriteling {
      */
     play: (scriptName?: string | Animation, animationObject?: Animation) => boolean;
     /**
+     * Get the current play state
+     */
+    isPlaying: () => boolean;
+    /**
      * Reverse direction of play
      */
     reverse: () => void;
+    /**
+     * Get the current play state
+     */
+    isReversed: () => boolean;
     /**
      * Stop the animation
      */

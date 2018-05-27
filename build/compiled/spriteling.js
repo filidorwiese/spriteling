@@ -80,11 +80,8 @@ class Spriteling {
         this.setTempo = (tempo) => {
             this.playhead.tempo = tempo;
         };
-        /**
-         * Get the current frame
-         */
-        this.current = () => {
-            return this.playhead.currentFrame;
+        this.getTempo = () => {
+            return this.playhead.tempo;
         };
         /**
          * Go forward one frame
@@ -211,10 +208,22 @@ class Spriteling {
             }
         };
         /**
+         * Get the current play state
+         */
+        this.isPlaying = () => {
+            return this.playhead.play;
+        };
+        /**
          * Reverse direction of play
          */
         this.reverse = () => {
             this.playhead.reversed = !this.playhead.reversed;
+        };
+        /**
+         * Get the current play state
+         */
+        this.isReversed = () => {
+            return this.playhead.reversed;
         };
         /**
          * Stop the animation
