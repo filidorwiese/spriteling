@@ -195,7 +195,7 @@
         play: true,
         delay: 50,
         tempo: 1,
-        run: 1,
+        run: -1,
         reversed: false,
         outOfViewStop: false,
         script: [],
@@ -209,7 +209,7 @@
     };
     var Spriteling = /** @class */ (function () {
         /**
-         * Creates a new Spritling instance. The options object can contain the following values
+         * Creates a new Spriteling instance. The options object can contain the following values
          * - url: url to spriteSheet, if not set the css background-image will be used
          * - cols: number columns in the spritesheet (mandatory)
          * - rows: number rows in the spritesheet (mandatory)
@@ -287,14 +287,14 @@
                 _this.playhead.tempo = tempo;
             };
             /**
-             * Get current playback tempo
+             * Get playback tempo, double-speed = 2, half-speed = .5 (default:1)
              * @returns {number}
              */
             this.getTempo = function () {
                 return _this.playhead.tempo;
             };
             /**
-             * Step the animation forward one frame
+             * Step the animation ahead one frame
              * @returns {boolean}
              */
             this.next = function () {
@@ -353,7 +353,7 @@
                 return _this.drawFrame(frame);
             };
             /**
-             * Resumes/plays current or given animation.
+             * Resume/play current or given animation.
              * Method can be called in four ways:
              *
              * .play() - resume current animation sequence (if not set - loops over all sprites once)
@@ -396,6 +396,7 @@
                 }
                 else {
                     var animationScript = void 0;
+                    var animationOptions = {};
                     // play('someAnimation')
                     if (typeof scriptName === 'string' && !options) {
                         if (_this.spriteSheet.animations[scriptName]) {
@@ -409,19 +410,18 @@
                     }
                     else if (typeof scriptName === 'string' && typeof options === 'object') {
                         animationScript = _this.spriteSheet.animations[scriptName];
+                        animationOptions = options;
                         // play({ options })
                     }
                     else if (typeof scriptName === 'object' && !options) {
-                        options = scriptName;
                         animationScript = _this.playhead.script;
+                        animationOptions = scriptName;
                     }
-                    if (options) {
-                        if (!animationScript) {
-                            _this.log('info', "playing animation \"all\"");
-                            animationScript = _this.spriteSheet.animations.all;
-                        }
-                        _this.playhead = __assign({}, playheadDefaults, { script: animationScript }, options);
+                    if (!animationScript) {
+                        _this.log('info', "playing animation \"all\"");
+                        animationScript = _this.spriteSheet.animations.all;
                     }
+                    _this.playhead = __assign({}, playheadDefaults, { script: animationScript }, animationOptions);
                 }
                 // Enter the animation loop
                 if (_this.playhead.run !== 0) {
@@ -625,7 +625,7 @@
                 }
                 // onFrame callback
                 if (typeof _this.playhead.onFrame === 'function') {
-                    _this.playhead.onFrame();
+                    _this.playhead.onFrame(_this.playhead.currentFrame);
                 }
                 return true;
             };
@@ -650,7 +650,7 @@
                 if (typeof console === 'undefined' || (level === 'info' && !_this.debug)) {
                     return;
                 }
-                console[level]("SpriteLing: " + message);
+                console[level]("Spriteling: " + message);
             };
             // Lookup element by selector
             if (element) {

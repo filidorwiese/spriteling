@@ -38,7 +38,7 @@ export declare type AnimationOptions = {
     outOfViewStop?: boolean;
     onPlay?: () => void;
     onStop?: () => void;
-    onFrame?: () => void;
+    onFrame?: (frameNumber: number) => void;
 };
 export declare type Animation = AnimationOptions & {
     script: Frame[];
