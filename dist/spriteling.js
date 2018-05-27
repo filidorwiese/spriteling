@@ -195,7 +195,7 @@
         play: true,
         delay: 50,
         tempo: 1,
-        run: 1,
+        run: -1,
         reversed: false,
         outOfViewStop: false,
         script: [],
@@ -396,6 +396,7 @@
                 }
                 else {
                     var animationScript = void 0;
+                    var animationOptions = {};
                     // play('someAnimation')
                     if (typeof scriptName === 'string' && !options) {
                         if (_this.spriteSheet.animations[scriptName]) {
@@ -409,19 +410,18 @@
                     }
                     else if (typeof scriptName === 'string' && typeof options === 'object') {
                         animationScript = _this.spriteSheet.animations[scriptName];
+                        animationOptions = options;
                         // play({ options })
                     }
                     else if (typeof scriptName === 'object' && !options) {
-                        options = scriptName;
                         animationScript = _this.playhead.script;
+                        animationOptions = scriptName;
                     }
-                    if (options) {
-                        if (!animationScript) {
-                            _this.log('info', "playing animation \"all\"");
-                            animationScript = _this.spriteSheet.animations.all;
-                        }
-                        _this.playhead = __assign({}, playheadDefaults, { script: animationScript }, options);
+                    if (!animationScript) {
+                        _this.log('info', "playing animation \"all\"");
+                        animationScript = _this.spriteSheet.animations.all;
                     }
+                    _this.playhead = __assign({}, playheadDefaults, { script: animationScript }, animationOptions);
                 }
                 // Enter the animation loop
                 if (_this.playhead.run !== 0) {
@@ -650,7 +650,7 @@
                 if (typeof console === 'undefined' || (level === 'info' && !_this.debug)) {
                     return;
                 }
-                console[level]("SpriteLing: " + message);
+                console[level]("Spriteling: " + message);
             };
             // Lookup element by selector
             if (element) {

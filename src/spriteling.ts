@@ -6,7 +6,7 @@ const playheadDefaults: Animation = {
   play: true,
   delay: 50,
   tempo: 1,
-  run: 1,
+  run: -1,
   reversed: false,
   outOfViewStop: false,
   script: [],
@@ -275,6 +275,7 @@ class Spriteling {
 
     } else {
       let animationScript: Frame[]
+      let animationOptions: AnimationOptions = {}
 
       // play('someAnimation')
       if (typeof scriptName === 'string' && !options) {
@@ -288,24 +289,22 @@ class Spriteling {
         // play('someAnimation', { options })
       } else if (typeof scriptName === 'string' && typeof options === 'object') {
         animationScript = this.spriteSheet.animations[scriptName]
+        animationOptions = options
 
         // play({ options })
       } else if (typeof scriptName === 'object' && !options) {
-        options = scriptName
         animationScript = this.playhead.script
-
+        animationOptions = scriptName
       }
 
-      if (options) {
-        if (!animationScript) {
-          this.log('info', `playing animation "all"`)
-          animationScript = this.spriteSheet.animations.all
-        }
-        this.playhead = {
-          ...playheadDefaults,
-          ...{script: animationScript},
-          ...options
-        }
+      if (!animationScript) {
+        this.log('info', `playing animation "all"`)
+        animationScript = this.spriteSheet.animations.all
+      }
+      this.playhead = {
+        ...playheadDefaults,
+        ...{script: animationScript},
+        ...animationOptions
       }
     }
 
@@ -572,7 +571,7 @@ class Spriteling {
     if (typeof console === 'undefined' || (level === 'info' && !this.debug)) {
       return
     }
-    console[level](`SpriteLing: ${message}`)
+    console[level](`Spriteling: ${message}`)
   }
 }
 
