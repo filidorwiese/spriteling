@@ -1,7 +1,7 @@
 {
   "name": "spriteling",
   "version": "0.0.4",
-  "description": "Scripted Spritesheet Animation",
+  "description": "Spritesheet Animation Engine",
   "main": "dist/spriteling.js",
   "scripts": {
     "develop": "rollup -w -c ./rollup.config.js",

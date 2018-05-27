@@ -47,7 +47,7 @@ class Spriteling {
   private debug: boolean
 
   /**
-   * Creates a new Spritling instance. The options object can contain the following values
+   * Creates a new Spriteling instance. The options object can contain the following values
    * - url: url to spriteSheet, if not set the css background-image will be used
    * - cols: number columns in the spritesheet (mandatory)
    * - rows: number rows in the spritesheet (mandatory)
@@ -67,7 +67,7 @@ class Spriteling {
   constructor(
     options: SpriteSheetOptions,
     element: HTMLElement | string,
-    debug = false
+    debug: boolean = false
   ) {
     // Lookup element by selector
     if (element) {
@@ -150,7 +150,7 @@ class Spriteling {
   }
 
   /**
-   * Get current playback tempo
+   * Get playback tempo, double-speed = 2, half-speed = .5 (default:1)
    * @returns {number}
    */
   public getTempo = (): number => {
@@ -158,10 +158,10 @@ class Spriteling {
   }
 
   /**
-   * Step the animation forward one frame
+   * Step the animation ahead one frame
    * @returns {boolean}
    */
-  public next = () => {
+  public next = (): boolean => {
     if (!this.spriteSheet.loaded) {
       return false
     }
@@ -183,7 +183,7 @@ class Spriteling {
    * Step the animation backwards one frame
    * @returns {boolean}
    */
-  public previous = () => {
+  public previous = (): boolean => {
     if (!this.spriteSheet.loaded) {
       return false
     }
@@ -206,7 +206,7 @@ class Spriteling {
    * @param frameNumber [integer]
    * @returns {boolean}
    */
-  public goTo = (frameNumber: number) => {
+  public goTo = (frameNumber: number): boolean => {
     if (!this.spriteSheet.loaded) {
       return false
     }
@@ -227,7 +227,7 @@ class Spriteling {
   }
 
   /**
-   * Resumes/plays current or given animation.
+   * Resume/play current or given animation.
    * Method can be called in four ways:
    *
    * .play() - resume current animation sequence (if not set - loops over all sprites once)
@@ -542,7 +542,7 @@ class Spriteling {
 
     // onFrame callback
     if (typeof this.playhead.onFrame === 'function') {
-      this.playhead.onFrame()
+      this.playhead.onFrame(this.playhead.currentFrame)
     }
 
     return true
@@ -558,7 +558,7 @@ class Spriteling {
       rect.top + this.spriteSheet.frameHeight >= 0 &&
       rect.left + this.spriteSheet.frameWidth >= 0 &&
       rect.bottom - this.spriteSheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right - this.spriteSheet.frameWidth<= (window.innerWidth || document.documentElement.clientWidth)
+      rect.right - this.spriteSheet.frameWidth <= (window.innerWidth || document.documentElement.clientWidth)
     )
   }
 

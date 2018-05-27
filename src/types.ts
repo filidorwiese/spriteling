@@ -40,7 +40,7 @@ export type AnimationOptions = {
   outOfViewStop?: boolean,
   onPlay?: () => void,
   onStop?: () => void,
-  onFrame?: () => void
+  onFrame?: (frameNumber: number) => void
 }
 
 export type Animation = AnimationOptions & {

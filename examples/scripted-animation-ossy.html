@@ -20,7 +20,7 @@
 </div>
 
 <script>
-  var sprite = new Spriteling({
+  const sprite = new Spriteling({
     url: './sprites/ossy.png',
     top: 200,
     left: 100,
@@ -99,7 +99,7 @@
   ])
 
   sprite.addScript('blink', [
-    {sprite: 10, delay: 5000},
+    {sprite: 10, delay: 3000},
     {sprite: 15, delay: 350}
   ])
 

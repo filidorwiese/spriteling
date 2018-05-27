@@ -209,7 +209,7 @@
     };
     var Spriteling = /** @class */ (function () {
         /**
-         * Creates a new Spritling instance. The options object can contain the following values
+         * Creates a new Spriteling instance. The options object can contain the following values
          * - url: url to spriteSheet, if not set the css background-image will be used
          * - cols: number columns in the spritesheet (mandatory)
          * - rows: number rows in the spritesheet (mandatory)
@@ -287,14 +287,14 @@
                 _this.playhead.tempo = tempo;
             };
             /**
-             * Get current playback tempo
+             * Get playback tempo, double-speed = 2, half-speed = .5 (default:1)
              * @returns {number}
              */
             this.getTempo = function () {
                 return _this.playhead.tempo;
             };
             /**
-             * Step the animation forward one frame
+             * Step the animation ahead one frame
              * @returns {boolean}
              */
             this.next = function () {
@@ -353,7 +353,7 @@
                 return _this.drawFrame(frame);
             };
             /**
-             * Resumes/plays current or given animation.
+             * Resume/play current or given animation.
              * Method can be called in four ways:
              *
              * .play() - resume current animation sequence (if not set - loops over all sprites once)
@@ -625,7 +625,7 @@
                 }
                 // onFrame callback
                 if (typeof _this.playhead.onFrame === 'function') {
-                    _this.playhead.onFrame();
+                    _this.playhead.onFrame(_this.playhead.currentFrame);
                 }
                 return true;
             };

@@ -27,7 +27,7 @@
 </div>
 
 <script>
-  var sprite = new Spriteling({
+  const sprite = new Spriteling({
     url: './sprites/reading.png',
     top: 200,
     left: 100,
@@ -71,7 +71,7 @@
   ])
 
   sprite.play('read', {
-    run: 1,
+    run: -1,
     delay: 200
   })
 
@@ -94,11 +94,11 @@
     sprite.reverse()
   })
   document.querySelector('#goTo').addEventListener('click', function () {
-    var frameNumber = document.getElementById('framenumber').value || 0
+    const frameNumber = document.getElementById('framenumber').value || 0
     sprite.goTo(frameNumber)
   })
   document.querySelector('#setTempo').addEventListener('click', function () {
-    var tempo = document.getElementById('tempo').value || 1
+    const tempo = document.getElementById('tempo').value || 1
     sprite.setTempo(tempo)
   })
 </script>
