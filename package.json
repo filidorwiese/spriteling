@@ -2,7 +2,7 @@
   "name": "spriteling",
   "version": "0.0.3",
   "description": "Scripted Spritesheet Animation",
-  "main": "dist/spriteling.min.js",
+  "main": "dist/spriteling.js",
   "scripts": {
     "develop": "rollup -w -c ./rollup.config.js",
     "build": "rollup -c ./rollup.config.js && rollup -c ./rollup.config.build.js",
