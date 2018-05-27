@@ -1,6 +1,5 @@
 
-export type SpriteSheet = {
-  loaded: boolean,
+export type SpriteSheetOptions = {
   url: string,
   cols: number,
   rows: number,
@@ -10,40 +9,44 @@ export type SpriteSheet = {
   left: number | 'center',
   right: number,
   startSprite: number,
+  onLoaded: () => void
+}
+
+export type SpriteSheet = SpriteSheetOptions & {
+  loaded: boolean,
   totalSprites: number,
   sheetWidth: number,
   sheetHeight: number,
   frameWidth: number,
   frameHeight: number,
   animations: { [key: string]: Frame[] }
-  onLoaded: () => void,
 }
 
 export type Frame = {
   sprite: number,
-  delay: number,
-  top: number,
-  right: number,
-  bottom: number,
-  left: number
+  delay?: number,
+  top?: number,
+  right?: number,
+  bottom?: number,
+  left?: number
 }
 
-export type Animation = {
-  play: boolean,
-  delay: number,
-  tempo: number,
-  run: number,
-  reversed: boolean,
-  outOfViewStop: boolean,
+export type AnimationOptions = {
+  play?: boolean,
+  delay?: number,
+  tempo?: number,
+  run?: number,
+  reversed?: boolean,
+  outOfViewStop?: boolean,
+  onPlay?: () => void,
+  onStop?: () => void,
+  onFrame?: () => void
+}
+
+export type Animation = AnimationOptions & {
   script: Frame[],
   lastTime: number,
   nextDelay: number,
   currentFrame: number,
-  currentSprite: number,
-  onPlay: () => void,
-  onStop: () => void,
-  onFrame: () => void
-}
-
-export type Internal = {
+  currentSprite: number
 }
