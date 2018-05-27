@@ -21,13 +21,12 @@
 
 <script>
   var sprite = new SpriteLing({
-    debug: true,
     url: './sprites/ossy.png',
     top: 200,
     left: 100,
     cols: 6,
     rows: 4
-  }, '#sprite')
+  }, '#sprite', true)
 
   sprite.addScript('paw', [
     {sprite: 22, delay: 100},

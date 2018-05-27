@@ -29,13 +29,12 @@
 <script>
 
   var sprite = new SpriteLing({
-    debug: true,
     url: './sprites/arcade.png',
     top: 200,
     left: 100,
     cols: 3,
     rows: 9
-  }, '#sprite')
+  }, '#sprite', true)
 
   sprite.play('all', {
     run: -1,

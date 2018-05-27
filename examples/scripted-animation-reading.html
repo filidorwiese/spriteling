@@ -28,13 +28,12 @@
 
 <script>
   var sprite = new SpriteLing({
-    debug: true,
     url: './sprites/reading.png',
     top: 200,
     left: 100,
     cols: 5,
     rows: 3
-  }, '#sprite')
+  }, '#sprite', true)
 
   sprite.addScript('read', [
     // read lines

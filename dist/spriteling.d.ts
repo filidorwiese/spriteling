@@ -3,6 +3,7 @@ declare class Spriteling {
     private spriteSheet;
     private playhead;
     private readonly element;
+    private debug;
     /**
      * @options: object to override global options with, the following properties can be set
      *           - debug: show debug logging in console (default: false)
@@ -15,7 +16,7 @@ declare class Spriteling {
      *           - onLoaded: callback that will be called when loading has finished
      * @element: can be a css selector or DOM element or false (in which case a new div element will be created)
      */
-    constructor(options: any, element: HTMLElement | string);
+    constructor(options: any, element: HTMLElement | string, debug?: boolean);
     /**
      * Show certain sprite (circumvents the current animation sequence)
      */

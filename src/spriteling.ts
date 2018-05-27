@@ -21,7 +21,6 @@ const playheadDefaults: Animation = {
 
 class Spriteling {
   private spriteSheet: SpriteSheet = {
-    debug: false,
     loaded: false,
     url: null,
     cols: null,
@@ -45,6 +44,8 @@ class Spriteling {
 
   private readonly element: HTMLElement
 
+  private debug: boolean
+
   /**
    * @options: object to override global options with, the following properties can be set
    *           - debug: show debug logging in console (default: false)
@@ -58,7 +59,7 @@ class Spriteling {
    * @element: can be a css selector or DOM element or false (in which case a new div element will be created)
    */
 
-  constructor(options, element: HTMLElement | string) {
+  constructor(options, element: HTMLElement | string, debug = false) {
     // Lookup element by selector
     if (element) {
       this.element = typeof element === 'string' ? document.querySelector(element) : element
@@ -74,6 +75,7 @@ class Spriteling {
     // Combine options with defaults
     this.spriteSheet = {...this.spriteSheet, ...options}
     this.playhead = {...playheadDefaults}
+    this.debug = debug
 
     // Initialize spritesheet
     if (!options.cols) {
@@ -523,7 +525,7 @@ class Spriteling {
    * @private
    */
   private log = (level, message) => {
-    if (level === 'info' && !this.spriteSheet.debug) {
+    if (typeof console === 'undefined' || (level === 'info' && !this.debug)) {
       return
     }
     console[level](`SpriteLing: ${message}`)

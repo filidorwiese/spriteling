@@ -1,6 +1,5 @@
 export declare type SpriteSheet = {
     loaded: boolean;
-    debug: boolean;
     url: string;
     cols: number;
     rows: number;

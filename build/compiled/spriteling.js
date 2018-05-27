@@ -29,9 +29,8 @@ class Spriteling {
      *           - onLoaded: callback that will be called when loading has finished
      * @element: can be a css selector or DOM element or false (in which case a new div element will be created)
      */
-    constructor(options, element) {
+    constructor(options, element, debug = false) {
         this.spriteSheet = {
-            debug: false,
             loaded: false,
             url: null,
             cols: null,
@@ -417,7 +416,7 @@ class Spriteling {
          * @private
          */
         this.log = (level, message) => {
-            if (level === 'info' && !this.spriteSheet.debug) {
+            if (typeof console === 'undefined' || (level === 'info' && !this.debug)) {
                 return;
             }
             console[level](`SpriteLing: ${message}`);
@@ -435,6 +434,7 @@ class Spriteling {
         // Combine options with defaults
         this.spriteSheet = Object.assign({}, this.spriteSheet, options);
         this.playhead = Object.assign({}, playheadDefaults);
+        this.debug = debug;
         // Initialize spritesheet
         if (!options.cols) {
             this.log('error', 'options.cols not set');
