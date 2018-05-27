@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2017",
+    "target": "es5",
     "moduleResolution": "node",
     "outDir": "build/compiled",
     "declaration": true
