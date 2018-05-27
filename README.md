@@ -1,8 +1,8 @@
 # Spriteling
 
-A scriptable spritesheet animation engine that works directly on DOM elements (no canvas). It's written in ES5 compatible JavaScript, has no external dependencies and a tiny footprint (~3KB minified/gzipped).
+A scriptable spritesheet animation engine that works directly on DOM elements (no canvas). It's build as ES5 compatible JavaScript, has no external dependencies and a tiny footprint (~3KB minified/gzipped).
 
-Install using node:
+### Install using node
 
 `npm install --save spriteling`
 
@@ -42,13 +42,15 @@ Finally call .play() on it with some optional parameters.
 </script>
 ```
 
-View the demo at [Looping "Arcade" animation](https://fili.nl/spriteling-examples/looping-animation-arcade.html)
+You can see it in action at ["Arcade" animation](https://fili.nl/spriteling-examples/looping-animation-arcade.html)
 
 ### Example 2: Scripted animation 
 
-Looping sure is nice! But when we have a non-linear animation to build, we would need to have more fine-grained control over the individual steps. Like which sprite to show and for how long.
+Looping sure is nice! But when we have a non-linear animation to build, we need to have fine-grained control over the individual steps. Like the sequencing of the sprites and timing them correctly. Take this spritesheet of a reading character for example:
 
 <img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/sprites/reading.png" width="200">
+
+For this animation, simply looping the images won't do. We need to add an animation script to get the desired result: 
 
 ```html
 <div id="sprite"></div>
@@ -103,7 +105,9 @@ Looping sure is nice! But when we have a non-linear animation to build, we would
 </script>
 ```
 
-View the demo's at [Scripted "Reading" animation](https://fili.nl/spriteling-examples/scripted-animation-reading.html) and [Scripted "Doggy training" animation](https://fili.nl/spriteling-examples/scripted-animation-ossy.html).
+You can view it at ["Reading" animation](https://fili.nl/spriteling-examples/scripted-animation-reading.html).
+
+Another scripted demo can be seen at ["Dog training" animation](https://fili.nl/spriteling-examples/scripted-animation-ossy.html).
 
 ### More advanced examples
 But we shouldn't stop there! When adding positioning to the animation script, we can easily create a walking character. And the character truly comes alive when we add user interaction, like mouse events. Feel free to have a look at these websites that I've created:
@@ -181,7 +185,7 @@ The `script` parameter should be an array consisting of frame objects. These fra
 Property | Type | Required | Default&nbsp;value | Explanation
 :------------- |:------------- |:-------------:| :-------------:| :-------------
 sprite | `number` | yes |  | Which sprite from spritesheet to show (counted from top-left to bottom-right)
-delay | `number` |no | global delay time | Time in ms to wait after this frame has been rendered
+delay | `number` | no | delay defined with .play() | Time in ms to wait after this frame has been rendered
 top bottom left right | `number` | no | 0 | Move the position of the placeholder to any direction after frame has been rendered
 
 ## .setTempo( tempo: `number`)
@@ -243,7 +247,7 @@ delay | `number` | no | 50 | Default delay for all frames that don't have a dela
 tempo | `number` | no | 1 | Timescale for all delays, double-speed = 2, half-speed = .5
 reversed | `boolean` | no | false | Direction of the animation head, true == backwards
 outOfViewStop | `boolean` | no | false | Stop animation if placeholder is no longer in view
-script | `Array<Frame>` | no | all frames | New animation array or named script that has been previously been defined, see `.addScript()`
+script | `Array<Frame>` | no | all frames | New animation sequence
 onPlay() | `function` | no |  | Callback called when animator starts playing
 onStop() | `function` | no | null | Callback called when animator stops playing
 onFrame() | `function` | no | null | Callback called when the new frame is rendered
