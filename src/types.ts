@@ -1,5 +1,6 @@
 
 export type SpriteSheet = {
+  loaded: boolean,
   debug: boolean,
   url: string,
   cols: number,
@@ -10,6 +11,12 @@ export type SpriteSheet = {
   left: number | 'center',
   right: number,
   startSprite: number,
+  totalSprites: number,
+  sheetWidth: number,
+  sheetHeight: number,
+  frameWidth: number,
+  frameHeight: number,
+  animations: { [key: string]: Frame[] }
   onLoaded: () => void,
 }
 
@@ -40,11 +47,4 @@ export type Animation = {
 }
 
 export type Internal = {
-  loaded: boolean,
-  totalSprites: number,
-  sheetWidth: number,
-  sheetHeight: number,
-  frameWidth: number,
-  frameHeight: number,
-  animations: { [key: string]: Frame[] }
 }

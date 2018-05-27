@@ -1,10 +1,28 @@
 import imageLoaded from 'image-loaded'
 import raf from 'raf'
-import {Animation, Frame, Internal, SpriteSheet} from './types'
+import {Animation, Frame, SpriteSheet} from './types'
+
+const playheadDefaults: Animation = {
+  play: true,
+  delay: 50,
+  tempo: 1,
+  run: 1,
+  reversed: false,
+  outOfViewStop: false,
+  script: [],
+  lastTime: 0,
+  nextDelay: 0,
+  currentFrame: -1,
+  currentSprite: 1,
+  onPlay: null,
+  onStop: null,
+  onFrame: null
+}
 
 class Spriteling {
-  private spriteSheetDefaults: SpriteSheet = {
+  private spriteSheet: SpriteSheet = {
     debug: false,
+    loaded: false,
     url: null,
     cols: null,
     rows: null,
@@ -14,37 +32,14 @@ class Spriteling {
     left: null,
     right: null,
     startSprite: 1,
-    onLoaded: null
-  }
-
-  private animationDefaults: Animation = {
-    play: true,
-    delay: 50,
-    tempo: 1,
-    run: 1,
-    reversed: false,
-    outOfViewStop: false,
-    script: [],
-    lastTime: 0,
-    nextDelay: 0,
-    currentFrame: -1,
-    currentSprite: 1,
-    onPlay: null,
-    onStop: null,
-    onFrame: null
-  }
-
-  private internal: Internal = {
-    loaded: false,
     totalSprites: 0,
     sheetWidth: 0,
     sheetHeight: 0,
     frameWidth: 0,
     frameHeight: 0,
-    animations: {}
+    animations: {},
+    onLoaded: null
   }
-
-  private spriteSheet: SpriteSheet
 
   private playhead: Animation
 
@@ -77,8 +72,8 @@ class Spriteling {
     }
 
     // Combine options with defaults
-    this.spriteSheet = {...this.spriteSheetDefaults, ...options}
-    this.playhead = {...this.animationDefaults}
+    this.spriteSheet = {...this.spriteSheet, ...options}
+    this.playhead = {...playheadDefaults}
 
     // Initialize spritesheet
     if (!options.cols) {
@@ -126,7 +121,7 @@ class Spriteling {
    *          - top/left/bottom/right: reposition the placeholder
    */
   public addScript = (name: string, script: Frame[]) => {
-    this.internal.animations[name] = script
+    this.spriteSheet.animations[name] = script
   }
 
   public setTempo = (tempo: number) => {
@@ -141,7 +136,7 @@ class Spriteling {
    * Go forward one frame
    */
   public next = () => {
-    if (!this.internal.loaded) {
+    if (!this.spriteSheet.loaded) {
       return false
     }
 
@@ -162,7 +157,7 @@ class Spriteling {
    * Go back one frame
    */
   public previous = () => {
-    if (!this.internal.loaded) {
+    if (!this.spriteSheet.loaded) {
       return false
     }
 
@@ -185,7 +180,7 @@ class Spriteling {
    * @returns {boolean}
    */
   public goTo = (frameNumber: number) => {
-    if (!this.internal.loaded) {
+    if (!this.spriteSheet.loaded) {
       return false
     }
 
@@ -218,7 +213,7 @@ class Spriteling {
    */
   public play = (scriptName?: string | Animation, animationObject?: Animation) => {
     // Not yet loaded, wait...
-    if (!this.internal.loaded) {
+    if (!this.spriteSheet.loaded) {
       setTimeout(() => {
         this.play(scriptName, animationObject)
       }, 50)
@@ -241,11 +236,11 @@ class Spriteling {
 
       // play('someAnimation')
       if (typeof scriptName === 'string' && !animationObject) {
-        if (this.internal.animations[scriptName]) {
+        if (this.spriteSheet.animations[scriptName]) {
           this.log('info', `playing animation "${scriptName}"`)
           animationObject = {
-            ...this.animationDefaults,
-            ...{script: this.internal.animations[scriptName]}
+            ...playheadDefaults,
+            ...{script: this.spriteSheet.animations[scriptName]}
           }
         } else {
           this.log('error', `animation "${scriptName}" not found`)
@@ -253,7 +248,7 @@ class Spriteling {
 
         // play('someAnimation', { options })
       } else if (typeof scriptName === 'string' && typeof animationObject === 'object') {
-        animationObject.script = this.internal.animations[scriptName]
+        animationObject.script = this.spriteSheet.animations[scriptName]
 
         // play({ options })
       } else if (typeof scriptName === 'object' && !animationObject) {
@@ -267,8 +262,8 @@ class Spriteling {
         }
 
         this.playhead = {
-          ...this.animationDefaults,
-          ...{script: this.internal.animations.all},
+          ...playheadDefaults,
+          ...{script: this.spriteSheet.animations.all},
           ...animationObject
         }
       }
@@ -334,38 +329,38 @@ class Spriteling {
 
     imageLoaded(preload, () => {
       // <- Fix for some unexplained firefox bug that loads this twice.
-      if (this.internal.loaded) {
+      if (this.spriteSheet.loaded) {
         return
       }
 
-      this.internal.loaded = true
+      this.spriteSheet.loaded = true
 
       this.log('info', 'loaded: ' + this.spriteSheet.url + ', sprites ' + this.spriteSheet.cols + ' x ' +
         this.spriteSheet.rows)
 
-      this.internal.sheetWidth = preload.width
-      this.internal.sheetHeight = preload.height
-      this.internal.frameWidth = this.internal.sheetWidth / this.spriteSheet.cols
-      this.internal.frameHeight = this.internal.sheetHeight / this.spriteSheet.rows
-      this.internal.totalSprites = (this.spriteSheet.cols * this.spriteSheet.rows) - this.spriteSheet.cutOffFrames
+      this.spriteSheet.sheetWidth = preload.width
+      this.spriteSheet.sheetHeight = preload.height
+      this.spriteSheet.frameWidth = this.spriteSheet.sheetWidth / this.spriteSheet.cols
+      this.spriteSheet.frameHeight = this.spriteSheet.sheetHeight / this.spriteSheet.rows
+      this.spriteSheet.totalSprites = (this.spriteSheet.cols * this.spriteSheet.rows) - this.spriteSheet.cutOffFrames
 
-      if (this.internal.frameWidth % 1 !== 0) {
-        this.log('error', 'frameWidth ' + this.internal.frameWidth + ' is not a whole number')
+      if (this.spriteSheet.frameWidth % 1 !== 0) {
+        this.log('error', 'frameWidth ' + this.spriteSheet.frameWidth + ' is not a whole number')
       }
-      if (this.internal.frameHeight % 1 !== 0) {
-        this.log('error', 'frameHeight ' + this.internal.frameHeight + ' is not a whole number')
+      if (this.spriteSheet.frameHeight % 1 !== 0) {
+        this.log('error', 'frameHeight ' + this.spriteSheet.frameHeight + ' is not a whole number')
       }
 
       this.element.style.position = 'absolute'
-      this.element.style.width = `${this.internal.frameWidth}px`
-      this.element.style.height = `${this.internal.frameHeight}px`
+      this.element.style.width = `${this.spriteSheet.frameWidth}px`
+      this.element.style.height = `${this.spriteSheet.frameHeight}px`
       this.element.style.backgroundImage = `url(${this.spriteSheet.url})`
       this.element.style.backgroundPosition = '0 0'
 
       if (this.spriteSheet.top !== null) {
         if (this.spriteSheet.top === 'center') {
           this.element.style.top = '50%'
-          this.element.style.marginTop = `${this.internal.frameHeight / 2 * -1}px`
+          this.element.style.marginTop = `${this.spriteSheet.frameHeight / 2 * -1}px`
         } else {
           this.element.style.top = `${this.spriteSheet.top}px`
         }
@@ -379,7 +374,7 @@ class Spriteling {
       if (this.spriteSheet.left !== null) {
         if (this.spriteSheet.left === 'center') {
           this.element.style.left = `${this.spriteSheet.left}px`
-          this.element.style.marginLeft = `${this.internal.frameWidth / 2 * -1}px`
+          this.element.style.marginLeft = `${this.spriteSheet.frameWidth / 2 * -1}px`
         } else {
           this.element.style.left = `${this.spriteSheet.left}px`
         }
@@ -387,11 +382,11 @@ class Spriteling {
 
       // Auto script the first 'all' animation sequence and make it default
       this.autoScript()
-      const animationObject = {script: this.internal.animations.all}
-      this.playhead = {...this.animationDefaults, ...animationObject}
+      const animationObject = {script: this.spriteSheet.animations.all}
+      this.playhead = {...playheadDefaults, ...animationObject}
 
       // Starting sprite?
-      if (this.spriteSheet.startSprite > 1 && this.spriteSheet.startSprite <= this.internal.totalSprites) {
+      if (this.spriteSheet.startSprite > 1 && this.spriteSheet.startSprite <= this.spriteSheet.totalSprites) {
         this.showSprite(this.spriteSheet.startSprite)
       }
 
@@ -407,7 +402,7 @@ class Spriteling {
    */
   private autoScript = () => {
     const script = []
-    for (let i = 0; i < this.internal.totalSprites; i++) {
+    for (let i = 0; i < this.spriteSheet.totalSprites; i++) {
       script[i] = {sprite: (i + 1)}
     }
     this.addScript('all', script)
@@ -421,7 +416,7 @@ class Spriteling {
     const requestFrameId = raf(this.loop)
 
     // Wait until fully loaded
-    if (this.element !== null && this.internal.loaded) {
+    if (this.element !== null && this.spriteSheet.loaded) {
 
       // Only play when not paused
       if (this.playhead.play) {
@@ -479,8 +474,8 @@ class Spriteling {
     const rect = this.element.getBoundingClientRect()
     const row = Math.ceil(frame.sprite / this.spriteSheet.cols)
     const col = frame.sprite - ((row - 1) * this.spriteSheet.cols)
-    const bgX = ((col - 1) * this.internal.frameWidth) * -1
-    const bgY = ((row - 1) * this.internal.frameHeight) * -1
+    const bgX = ((col - 1) * this.spriteSheet.frameWidth) * -1
+    const bgY = ((row - 1) * this.spriteSheet.frameHeight) * -1
 
     if (row > this.spriteSheet.rows || col > this.spriteSheet.cols) {
       this.log('error', `position ${frame.sprite} out of bound'`)
@@ -514,9 +509,9 @@ class Spriteling {
    */
   private inViewport = () => {
     const rect = this.element.getBoundingClientRect()
-    const aboveTop = (window.scrollY >= rect.top + this.internal.frameHeight)
+    const aboveTop = (window.scrollY >= rect.top + this.spriteSheet.frameHeight)
     const belowFold = (window.innerHeight + window.scrollY <= rect.top)
-    const leftOfScreen = (window.scrollX >= rect.left + this.internal.frameWidth)
+    const leftOfScreen = (window.scrollX >= rect.left + this.spriteSheet.frameWidth)
     const rightOfScreen = (window.innerWidth + window.scrollX <= rect.left)
     return (!aboveTop && !belowFold && !leftOfScreen && !rightOfScreen)
   }

@@ -1,8 +1,5 @@
 import { Animation, Frame } from './types';
 declare class Spriteling {
-    private spriteSheetDefaults;
-    private animationDefaults;
-    private internal;
     private spriteSheet;
     private playhead;
     private readonly element;

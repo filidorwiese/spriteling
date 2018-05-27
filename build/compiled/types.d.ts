@@ -1,4 +1,5 @@
 export declare type SpriteSheet = {
+    loaded: boolean;
     debug: boolean;
     url: string;
     cols: number;
@@ -9,6 +10,14 @@ export declare type SpriteSheet = {
     left: number | 'center';
     right: number;
     startSprite: number;
+    totalSprites: number;
+    sheetWidth: number;
+    sheetHeight: number;
+    frameWidth: number;
+    frameHeight: number;
+    animations: {
+        [key: string]: Frame[];
+    };
     onLoaded: () => void;
 };
 export declare type Frame = {
@@ -35,14 +44,4 @@ export declare type Animation = {
     onStop: () => void;
     onFrame: () => void;
 };
-export declare type Internal = {
-    loaded: boolean;
-    totalSprites: number;
-    sheetWidth: number;
-    sheetHeight: number;
-    frameWidth: number;
-    frameHeight: number;
-    animations: {
-        [key: string]: Frame[];
-    };
-};
+export declare type Internal = {};
