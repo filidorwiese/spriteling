@@ -82,6 +82,8 @@ declare class Spriteling {
      * .play(scriptName, { options }) - play given animation script with given options
      * .play({ options }) - play current animation with given options
      *
+     * ScriptName loads a previously added animation with .addScript()
+     *
      * Options object can contain
      * - play: start playing the animation right away (default: true)
      * - run: the number of times the animation should run, -1 is infinite (default: 1)

@@ -6,7 +6,7 @@ export default {
   input: 'src/spriteling.ts',
   output: {
     file: 'dist/spriteling.min.js',
-    name: 'SpriteLing',
+    name: 'Spriteling',
     format: 'umd'
   },
   plugins: [

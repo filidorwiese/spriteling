@@ -82,6 +82,8 @@ declare class Spriteling {
      * .play(scriptName, { options }) - play given animation script with given options
      * .play({ options }) - play current animation with given options
      *
+     * ScriptName loads a previously added animation with .addScript()
+     *
      * Options object can contain
      * - play: start playing the animation right away (default: true)
      * - run: the number of times the animation should run, -1 is infinite (default: 1)
@@ -89,7 +91,6 @@ declare class Spriteling {
      * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
      * - reversed: direction of the animation head, true == backwards (default: false)
      * - outOfViewStop: stop animation if placeholder is no longer in view (default: false)
-     * - script: new animation array or string (in which case animation sequence is looked up)
      * - onPlay/onStop/onFrame: callbacks called at the appropriate times (default: null)
      *
      * @param {string | Animation} scriptName

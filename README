@@ -3,7 +3,6 @@ First version in the make
 TODO:
 * event bus
 * chaining?
-* jsdoc
 * tests?
 * cross-browser testing
 * build minified + non-minified

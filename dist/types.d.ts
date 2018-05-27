@@ -1,5 +1,4 @@
-export declare type SpriteSheet = {
-    debug: boolean;
+export declare type SpriteSheetOptions = {
     url: string;
     cols: number;
     rows: number;
@@ -11,31 +10,7 @@ export declare type SpriteSheet = {
     startSprite: number;
     onLoaded: () => void;
 };
-export declare type Frame = {
-    sprite: number;
-    delay: number;
-    top: number;
-    right: number;
-    bottom: number;
-    left: number;
-};
-export declare type Animation = {
-    play: boolean;
-    delay: number;
-    tempo: number;
-    run: number;
-    reversed: boolean;
-    outOfViewStop: boolean;
-    script: Frame[];
-    lastTime: number;
-    nextDelay: number;
-    currentFrame: number;
-    currentSprite: number;
-    onPlay: () => void;
-    onStop: () => void;
-    onFrame: () => void;
-};
-export declare type Internal = {
+export declare type SpriteSheet = SpriteSheetOptions & {
     loaded: boolean;
     totalSprites: number;
     sheetWidth: number;
@@ -45,4 +20,30 @@ export declare type Internal = {
     animations: {
         [key: string]: Frame[];
     };
+};
+export declare type Frame = {
+    sprite: number;
+    delay?: number;
+    top?: number;
+    right?: number;
+    bottom?: number;
+    left?: number;
+};
+export declare type AnimationOptions = {
+    play?: boolean;
+    delay?: number;
+    tempo?: number;
+    run?: number;
+    reversed?: boolean;
+    outOfViewStop?: boolean;
+    onPlay?: () => void;
+    onStop?: () => void;
+    onFrame?: () => void;
+};
+export declare type Animation = AnimationOptions & {
+    script: Frame[];
+    lastTime: number;
+    nextDelay: number;
+    currentFrame: number;
+    currentSprite: number;
 };
