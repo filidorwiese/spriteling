@@ -1,6 +1,6 @@
 {
   "name": "spriteling",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Scripted Spritesheet Animation",
   "main": "dist/spriteling.min.js",
   "scripts": {
