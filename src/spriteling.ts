@@ -301,7 +301,6 @@ class Spriteling {
           this.log('info', `playing animation "all"`)
           animationScript = this.spriteSheet.animations.all
         }
-
         this.playhead = {
           ...playheadDefaults,
           ...{script: animationScript},
@@ -491,7 +490,7 @@ class Spriteling {
             }
 
           } else {
-            if (this.playhead.outOfViewStop) {
+            if (this.playhead.play && this.playhead.outOfViewStop) {
               this.stop()
             }
           }
@@ -555,11 +554,12 @@ class Spriteling {
    */
   private inViewport = (): boolean => {
     const rect = this.element.getBoundingClientRect()
-    const aboveTop = (window.scrollY >= rect.top + this.spriteSheet.frameHeight)
-    const belowFold = (window.innerHeight + window.scrollY <= rect.top)
-    const leftOfScreen = (window.scrollX >= rect.left + this.spriteSheet.frameWidth)
-    const rightOfScreen = (window.innerWidth + window.scrollX <= rect.left)
-    return (!aboveTop && !belowFold && !leftOfScreen && !rightOfScreen)
+    return (
+      rect.top + this.spriteSheet.frameHeight >= 0 &&
+      rect.left + this.spriteSheet.frameWidth >= 0 &&
+      rect.bottom - this.spriteSheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right - this.spriteSheet.frameWidth<= (window.innerWidth || document.documentElement.clientWidth)
+    )
   }
 
   /**

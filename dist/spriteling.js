@@ -580,7 +580,7 @@
                                 }
                             }
                             else {
-                                if (_this.playhead.outOfViewStop) {
+                                if (_this.playhead.play && _this.playhead.outOfViewStop) {
                                     _this.stop();
                                 }
                             }
@@ -635,11 +635,10 @@
              */
             this.inViewport = function () {
                 var rect = _this.element.getBoundingClientRect();
-                var aboveTop = (window.scrollY >= rect.top + _this.spriteSheet.frameHeight);
-                var belowFold = (window.innerHeight + window.scrollY <= rect.top);
-                var leftOfScreen = (window.scrollX >= rect.left + _this.spriteSheet.frameWidth);
-                var rightOfScreen = (window.innerWidth + window.scrollX <= rect.left);
-                return (!aboveTop && !belowFold && !leftOfScreen && !rightOfScreen);
+                return (rect.top + _this.spriteSheet.frameHeight >= 0 &&
+                    rect.left + _this.spriteSheet.frameWidth >= 0 &&
+                    rect.bottom - _this.spriteSheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.right - _this.spriteSheet.frameWidth <= (window.innerWidth || document.documentElement.clientWidth));
             };
             /**
              * Log utility method
