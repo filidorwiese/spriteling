@@ -3,9 +3,8 @@ First version in the make
 TODO:
 * event bus
 * chaining?
-* fix loop?
-* convert to typescript?
 * jsdoc
-* debug logging
+* tests?
 * cross-browser testing
+* build minified + non-minified
 * cleanup

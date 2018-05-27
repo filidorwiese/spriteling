@@ -100,6 +100,10 @@ declare class Spriteling {
      */
     private drawFrame;
     /**
+     * Test to see if an element is within the viewport
+     */
+    private inViewport;
+    /**
      * Log utility method
      * @param level
      * @param message

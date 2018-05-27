@@ -419,7 +419,7 @@ class Spriteling {
         if ((time - this.playhead.lastTime) >= this.playhead.nextDelay) {
 
           // Render next frame only if element is visible and within viewport
-          if (this.element.offsetParent !== null) { // && _inViewport(this.element)
+          if (this.element.offsetParent !== null && this.inViewport()) {
 
             // Only play if run counter is still <> 0
             if (this.playhead.run === 0) {
@@ -465,6 +465,7 @@ class Spriteling {
     }
     this.playhead.currentSprite = frame.sprite
 
+    const rect = this.element.getBoundingClientRect()
     const row = Math.ceil(frame.sprite / this.spriteSheet.cols)
     const col = frame.sprite - ((row - 1) * this.spriteSheet.cols)
     const bgX = ((col - 1) * this.internal.frameWidth) * -1
@@ -476,7 +477,6 @@ class Spriteling {
 
     // Animate background
     this.element.style.backgroundPosition = `${bgX}px ${bgY}px`
-    const rect = this.element.getBoundingClientRect()
 
     // Move if indicated
     if (frame.top) {
@@ -496,6 +496,18 @@ class Spriteling {
     if (typeof this.playhead.onFrame === 'function') {
       this.playhead.onFrame()
     }
+  }
+
+  /**
+   * Test to see if an element is within the viewport
+   */
+  private inViewport = () => {
+    const rect = this.element.getBoundingClientRect()
+    const aboveTop = (window.scrollY >= rect.top + this.internal.frameHeight)
+    const belowFold = (window.innerHeight + window.scrollY <= rect.top)
+    const leftOfScreen = (window.scrollX >= rect.left + this.internal.frameWidth)
+    const rightOfScreen = (window.innerWidth + window.scrollX <= rect.left)
+    return (!aboveTop && !belowFold && !leftOfScreen && !rightOfScreen)
   }
 
   /**
