@@ -1,21 +1,22 @@
 <!DOCTYPE html>
 <html dir="ltr">
 <head>
-    <meta charset="UTF-8" />
-    <script type="text/javascript" src="./spriteling.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
-    <link href="./screen.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <script type="text/javascript" src="./spriteling.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+  <link href="./screen.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no" />
 </head>
 <body style="overflow: hidden; background-color: lightblue;">
 
 <div class="main">
-    <p>
-        <button id="plusone">+1</button>
-    </p>
+  <p>
+    <button id="plusone">+1</button>
+  </p>
 </div>
 
 <script>
-  function createSprite() {
+  function createSprite () {
     const y = window.innerHeight * Math.random()
     const url = Math.random() > .4 ? './sprites/ossy-bone.png' : './sprites/ossy-bone-float.png'
     const sprite = new Spriteling({
@@ -44,7 +45,22 @@
   })
 
   // Mr Doobs stat counter - https://github.com/mrdoob/stats.js/
-  javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);stats.dom.style.left='80px';stats.dom.style.top='20px';stats.dom.style.right='auto';requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})()
+  javascript:(function () {
+    var script = document.createElement('script')
+    script.onload = function () {
+      var stats = new Stats()
+      document.body.appendChild(stats.dom)
+      stats.dom.style.left = '80px'
+      stats.dom.style.top = '20px'
+      stats.dom.style.right = 'auto'
+      requestAnimationFrame(function loop () {
+        stats.update()
+        requestAnimationFrame(loop)
+      })
+    }
+    script.src = '//rawgit.com/mrdoob/stats.js/master/build/stats.min.js'
+    document.head.appendChild(script)
+  })()
 </script>
 
 </body>

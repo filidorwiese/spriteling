@@ -1,37 +1,40 @@
 <!DOCTYPE html>
 <html dir="ltr">
 <head>
-    <meta charset="UTF-8" />
-    <script type="text/javascript" src="./spriteling.js"></script>
-    <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
-    <link href="./screen.css" rel="stylesheet" />
+  <meta charset="UTF-8" />
+  <script type="text/javascript" src="./spriteling.js"></script>
+  <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+  <link href="./screen.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no" />
 </head>
-<body>
+<body style="background-color: lightcoral">
 
 <div class="main">
-    <p>
-        <button id="play">play</button>
-        <button id="stop">stop</button>
-        <button id="reset">reset</button>
-        <button id="next">next</button>
-        <button id="previous">previous</button>
-        <button id="reverse">reverse</button>
-    </p>
-    <p>
-        <label>Frame: </label><input type="text" size="5" id="framenumber" value="0" />
-        <button id="goTo">goTo</button>
-        <label>Tempo: </label><input type="text" size="5" id="tempo" value="1" />
-        <button id="setTempo">setTempo</button>
-    </p>
-    <div id="sprite"></div>
+  <p>
+    <button id="play">play</button>
+    <button id="stop">stop</button>
+    <button id="reset">reset</button>
+    <button id="next">next</button>
+    <button id="previous">previous</button>
+    <button id="reverse">reverse</button>
+  </p>
+  <p>
+    <label>Frame: </label><input type="text" size="5" id="framenumber" value="0" />
+    <button id="goTo">goTo</button>
+  </p>
+  <p>
+    <label>Tempo: </label><input type="text" size="5" id="tempo" value="1" />
+    <button id="setTempo">setTempo</button>
+  </p>
+  <div id="sprite"></div>
 </div>
 
 <script>
 
   const sprite = new Spriteling({
     url: './sprites/arcade.png',
-    top: 200,
-    left: 100,
+    top: 300,
+    left: 0,
     cols: 3,
     rows: 9
   }, '#sprite', true)
