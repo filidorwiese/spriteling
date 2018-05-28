@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+    <meta charset="UTF-8" />
+    <script type="text/javascript" src="./spriteling.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
+    <link href="./screen.css" rel="stylesheet" />
+</head>
+<body style="overflow: hidden; background-color: lightblue;">
+
+<div class="main">
+    <p>
+        <button id="plusone">+1</button>
+    </p>
+</div>
+
+<script>
+  function createSprite() {
+    const y = window.innerHeight * Math.random()
+    const url = Math.random() > .4 ? './sprites/ossy-bone.png' : './sprites/ossy-bone-float.png'
+    const sprite = new Spriteling({
+      url: url,
+      run: -1,
+      cols: 4,
+      rows: 1,
+      delay: 120,
+      left: -100,
+      top: y,
+      outOfViewStop: true
+    })
+
+    sprite.addScript('run', [
+      {sprite: 1, left: 15},
+      {sprite: 2, left: 15},
+      {sprite: 3, left: 15},
+      {sprite: 4, left: 15}
+    ])
+
+    sprite.play('run')
+  }
+
+  document.querySelector('#plusone').addEventListener('click', function () {
+    createSprite()
+  })
+
+  // Mr Doobs stat counter - https://github.com/mrdoob/stats.js/
+  javascript:(function(){var script=document.createElement('script');script.onload=function(){var stats=new Stats();document.body.appendChild(stats.dom);stats.dom.style.left='80px';stats.dom.style.top='20px';stats.dom.style.right='auto';requestAnimationFrame(function loop(){stats.update();requestAnimationFrame(loop)});};script.src='//rawgit.com/mrdoob/stats.js/master/build/stats.min.js';document.head.appendChild(script);})()
+</script>
+
+</body>
+</html>
