@@ -107,20 +107,21 @@ For this animation, simply looping the images won't do. We need to add an animat
 
 You can see it in action at ["Reading" demo](https://fili.nl/spriteling-examples/scripted-animation-reading.html). Another scripted animation can be seen at ["Dog training" demo](https://fili.nl/spriteling-examples/scripted-animation-ossy.html).
 
-### Example 3: multiple instances
-Spriteling is not hardware accelerated, no need for a canvas element or graphics card support. In fact, under the hood there is nothing more then a background positioning trick doing the hard work, which is as fast as it can get. 
-
-Even under stress it performs quite well, as you can see in the ["Multiple instances" demo](https://fili.nl/spriteling-examples/scripted-animation-reading.html)
+### Example 3: Multiple instances
+Spriteling is not hardware-accelerated, there is no need for a clunky WebGL canvas element or CSS properties that need GPU support. In fact, under the hood there is nothing more then a background positioning trick doing the hard work, which is as fast as it can get. Even under stress it performs quite well, as you can see in the ["Multiple instances" demo](https://fili.nl/spriteling-examples/scripted-animation-multiple.html)
 
 ### More advanced examples
 But we shouldn't stop there! When adding positioning to the animation script, we can easily create a walking character. And the character truly comes alive when we add user interaction, like mouse events.
 
 <img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/artwork/scared.gif">
 
-Some more examples:
+Feel free to check out these "Spriteling included" websites:
 
 * Website [galaxy.fili.nl](https://galaxy.fili.nl)
 * Website [filidorwiese.nl](https://filidorwiese.nl)
+* Website [whois.wildlife.la](http://whois.wildlife.la)
+
+Now it's up to you. Please keep me posted on what you've created! 
 
 # API
 
@@ -326,9 +327,7 @@ spriteling.reset()
 
 # Compatibility
 
-
-TODO: matrix
-
+Spriteling should work on almost anything. From IE7 to phones and tablets. Let me know if you find it doesn't work on a particular device and I'll see if I can fix that.
 
 
 # License
