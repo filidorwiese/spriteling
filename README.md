@@ -19,7 +19,7 @@ const Spriteling = require('spriteling')
 
 ### Example 1: Basic looping animation
 
-<img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/sprites/arcade-single.png">
+<img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/artwork/arcade-single.png">
 
 Create a DOM element on the page and give it an id. Pass it to a new instance of Spriteling, giving it some information about the spritesheet and where to put it on the page.
 Finally call .play() on it with some optional parameters.
@@ -48,7 +48,7 @@ You can see it in action at ["Arcade" animation](https://fili.nl/spriteling-exam
 
 Looping sure is nice! But when we have a non-linear animation to build, we need to have fine-grained control over the individual steps. Like the sequencing of the sprites and timing them correctly. Take this spritesheet of a reading character for example:
 
-<img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/sprites/reading.png" width="200">
+<img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/artwork/spritesheet-reading.png" width="200">
 
 For this animation, simply looping the images won't do. We need to add an animation script to get the desired result: 
 
@@ -105,16 +105,22 @@ For this animation, simply looping the images won't do. We need to add an animat
 </script>
 ```
 
-You can view it at ["Reading" animation](https://fili.nl/spriteling-examples/scripted-animation-reading.html).
+You can see it in action at ["Reading" demo](https://fili.nl/spriteling-examples/scripted-animation-reading.html). Another scripted animation can be seen at ["Dog training" demo](https://fili.nl/spriteling-examples/scripted-animation-ossy.html).
 
-Another scripted demo can be seen at ["Dog training" animation](https://fili.nl/spriteling-examples/scripted-animation-ossy.html).
+### Example 3: multiple instances
+Spriteling is not hardware accelerated, no need for a canvas element or graphics card support. In fact, under the hood there is nothing more then a background positioning trick doing the hard work, which is as fast as it can get. 
+
+Even under stress it performs quite well, as you can see in the ["Multiple instances" demo](https://fili.nl/spriteling-examples/scripted-animation-reading.html)
 
 ### More advanced examples
-But we shouldn't stop there! When adding positioning to the animation script, we can easily create a walking character. And the character truly comes alive when we add user interaction, like mouse events. Feel free to have a look at these websites that I've created:
+But we shouldn't stop there! When adding positioning to the animation script, we can easily create a walking character. And the character truly comes alive when we add user interaction, like mouse events.
 
+<img src="https://raw.githubusercontent.com/filidorwiese/spriteling/master/examples/artwork/scared.gif">
 
-* Website [filidorwiese.nl](https://filidorwiese.nl)
+Some more examples:
+
 * Website [galaxy.fili.nl](https://galaxy.fili.nl)
+* Website [filidorwiese.nl](https://filidorwiese.nl)
 
 # API
 
