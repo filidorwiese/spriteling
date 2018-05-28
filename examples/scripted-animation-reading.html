@@ -75,11 +75,7 @@
 
   sprite.play('read', {
     run: -1,
-    delay: 200,
-
-    onStop: () => {
-      sprite.destroy()
-    }
+    delay: 200
   })
 
   document.querySelector('#play').addEventListener('click', function () {

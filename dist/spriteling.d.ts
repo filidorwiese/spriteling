@@ -48,6 +48,36 @@ declare class Spriteling {
      */
     addScript: (name: string, script: Frame[]) => void;
     /**
+     * Resume/play current or given animation.
+     * Method can be called in four ways:
+     *
+     * .play() - resume current animation sequence (if not set - loops over all sprites once)
+     * .play(scriptName) - play given animation script
+     * .play(scriptName, { options }) - play given animation script with given options
+     * .play({ options }) - play current animation with given options
+     *
+     * ScriptName loads a previously added animation with .addScript()
+     *
+     * Options object can contain
+     * - play: start playing the animation right away (default: true)
+     * - run: the number of times the animation should run, -1 is infinite (default: 1)
+     * - delay: default delay for all frames that don't have a delay set (default: 50)
+     * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
+     * - reversed: direction of the animation head, true == backwards (default: false)
+     * - script: New unnamed animation sequence, array of frames, see .addScript (default: null)
+     * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
+     *
+     * @param {string | Animation} scriptName
+     * @param {Animation} options
+     * @returns {boolean}
+     */
+    play: (scriptName?: string | AnimationOptions, options?: AnimationOptions) => boolean;
+    /**
+     * Get the current play state
+     * @returns {boolean}
+     */
+    isPlaying: () => boolean;
+    /**
      * Set playback tempo, double-speed = 2, half-speed = .5 (default:1)
      * @param {number} tempo
      */
@@ -73,35 +103,6 @@ declare class Spriteling {
      * @returns {boolean}
      */
     goTo: (frameNumber: number) => boolean;
-    /**
-     * Resume/play current or given animation.
-     * Method can be called in four ways:
-     *
-     * .play() - resume current animation sequence (if not set - loops over all sprites once)
-     * .play(scriptName) - play given animation script
-     * .play(scriptName, { options }) - play given animation script with given options
-     * .play({ options }) - play current animation with given options
-     *
-     * ScriptName loads a previously added animation with .addScript()
-     *
-     * Options object can contain
-     * - play: start playing the animation right away (default: true)
-     * - run: the number of times the animation should run, -1 is infinite (default: 1)
-     * - delay: default delay for all frames that don't have a delay set (default: 50)
-     * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
-     * - reversed: direction of the animation head, true == backwards (default: false)
-     * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
-     *
-     * @param {string | Animation} scriptName
-     * @param {Animation} options
-     * @returns {boolean}
-     */
-    play: (scriptName?: string | AnimationOptions, options?: AnimationOptions) => boolean;
-    /**
-     * Get the current play state
-     * @returns {boolean}
-     */
-    isPlaying: () => boolean;
     /**
      * Reverse direction of play
      */

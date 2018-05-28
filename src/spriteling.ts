@@ -144,6 +144,107 @@ class Spriteling {
   }
 
   /**
+   * Resume/play current or given animation.
+   * Method can be called in four ways:
+   *
+   * .play() - resume current animation sequence (if not set - loops over all sprites once)
+   * .play(scriptName) - play given animation script
+   * .play(scriptName, { options }) - play given animation script with given options
+   * .play({ options }) - play current animation with given options
+   *
+   * ScriptName loads a previously added animation with .addScript()
+   *
+   * Options object can contain
+   * - play: start playing the animation right away (default: true)
+   * - run: the number of times the animation should run, -1 is infinite (default: 1)
+   * - delay: default delay for all frames that don't have a delay set (default: 50)
+   * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
+   * - reversed: direction of the animation head, true == backwards (default: false)
+   * - script: New unnamed animation sequence, array of frames, see .addScript (default: null)
+   * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
+   *
+   * @param {string | Animation} scriptName
+   * @param {Animation} options
+   * @returns {boolean}
+   */
+  public play = (
+    scriptName?: string | AnimationOptions,
+    options?: AnimationOptions
+  ) => {
+    // Not yet loaded, wait...
+    if (!this.spriteSheet.loaded) {
+      setTimeout(() => {
+        this.play(scriptName, options)
+      }, 50)
+      return false
+    }
+
+    // play()
+    if (!scriptName && !options) {
+
+      // Play if not already playing
+      if (!this.playhead.play) {
+        if (this.playhead.run === 0) {
+          this.playhead.run = 1
+        }
+        this.playhead.play = true
+      }
+
+    } else {
+      let animationScript: Frame[]
+      let animationOptions: AnimationOptions = {}
+
+      // play('someAnimation')
+      if (typeof scriptName === 'string' && !options) {
+        if (this.spriteSheet.animations[scriptName]) {
+          this.log('info', `playing animation "${scriptName}"`)
+          animationScript = this.spriteSheet.animations[scriptName]
+        } else {
+          this.log('error', `animation "${scriptName}" not found`)
+        }
+
+        // play('someAnimation', { options })
+      } else if (typeof scriptName === 'string' && typeof options === 'object') {
+        animationScript = this.spriteSheet.animations[scriptName]
+        animationOptions = options
+
+        // play({ options })
+      } else if (typeof scriptName === 'object' && !options) {
+        animationScript = this.playhead.script
+        animationOptions = scriptName
+      }
+
+      if (!animationScript) {
+        this.log('info', `playing animation "all"`)
+        animationScript = this.spriteSheet.animations.all
+      }
+      this.playhead = {
+        ...playheadDefaults,
+        ...{script: animationScript},
+        ...animationOptions
+      }
+    }
+
+    // Enter the animation loop
+    if (this.playhead.run !== 0) {
+      this.loop()
+    }
+
+    // onPlay callback
+    if (typeof this.playhead.onPlay === 'function') {
+      this.playhead.onPlay()
+    }
+  }
+
+  /**
+   * Get the current play state
+   * @returns {boolean}
+   */
+  public isPlaying = (): boolean => {
+    return this.playhead.play
+  }
+
+  /**
    * Set playback tempo, double-speed = 2, half-speed = .5 (default:1)
    * @param {number} tempo
    */
@@ -226,106 +327,6 @@ class Spriteling {
 
     this.log('info', 'frame: ' + this.playhead.currentFrame + ', sprite: ' + frame.sprite)
     return this.drawFrame(frame)
-  }
-
-  /**
-   * Resume/play current or given animation.
-   * Method can be called in four ways:
-   *
-   * .play() - resume current animation sequence (if not set - loops over all sprites once)
-   * .play(scriptName) - play given animation script
-   * .play(scriptName, { options }) - play given animation script with given options
-   * .play({ options }) - play current animation with given options
-   *
-   * ScriptName loads a previously added animation with .addScript()
-   *
-   * Options object can contain
-   * - play: start playing the animation right away (default: true)
-   * - run: the number of times the animation should run, -1 is infinite (default: 1)
-   * - delay: default delay for all frames that don't have a delay set (default: 50)
-   * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
-   * - reversed: direction of the animation head, true == backwards (default: false)
-   * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
-   *
-   * @param {string | Animation} scriptName
-   * @param {Animation} options
-   * @returns {boolean}
-   */
-  public play = (
-    scriptName?: string | AnimationOptions,
-    options?: AnimationOptions
-  ) => {
-    // Not yet loaded, wait...
-    if (!this.spriteSheet.loaded) {
-      setTimeout(() => {
-        this.play(scriptName, options)
-      }, 50)
-      return false
-    }
-
-    // play()
-    if (!scriptName && !options) {
-
-      // Play if not already playing
-      if (!this.playhead.play) {
-        if (this.playhead.run === 0) {
-          this.playhead.run = 1
-        }
-        this.playhead.play = true
-      }
-
-    } else {
-      let animationScript: Frame[]
-      let animationOptions: AnimationOptions = {}
-
-      // play('someAnimation')
-      if (typeof scriptName === 'string' && !options) {
-        if (this.spriteSheet.animations[scriptName]) {
-          this.log('info', `playing animation "${scriptName}"`)
-          animationScript = this.spriteSheet.animations[scriptName]
-        } else {
-          this.log('error', `animation "${scriptName}" not found`)
-        }
-
-        // play('someAnimation', { options })
-      } else if (typeof scriptName === 'string' && typeof options === 'object') {
-        animationScript = this.spriteSheet.animations[scriptName]
-        animationOptions = options
-
-        // play({ options })
-      } else if (typeof scriptName === 'object' && !options) {
-        animationScript = this.playhead.script
-        animationOptions = scriptName
-      }
-
-      if (!animationScript) {
-        this.log('info', `playing animation "all"`)
-        animationScript = this.spriteSheet.animations.all
-      }
-      this.playhead = {
-        ...playheadDefaults,
-        ...{script: animationScript},
-        ...animationOptions
-      }
-    }
-
-    // Enter the animation loop
-    if (this.playhead.run !== 0) {
-      this.loop()
-    }
-
-    // onPlay callback
-    if (typeof this.playhead.onPlay === 'function') {
-      this.playhead.onPlay()
-    }
-  }
-
-  /**
-   * Get the current play state
-   * @returns {boolean}
-   */
-  public isPlaying = (): boolean => {
-    return this.playhead.play
   }
 
   /**

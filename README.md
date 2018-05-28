@@ -175,10 +175,10 @@ Add a named animation sequence, for example:
 
 ```js
 spriteling.addScript('walk', [
-    { sprite:22, delay:100 },
-    { sprite:23, delay:100, left: 10 },
-    { sprite:24, delay:150, left: 5 },
-    { sprite:23, delay:100, left: 10 }
+    { sprite: 22, delay: 100 },
+    { sprite: 23, delay: 100, left: 10 },
+    { sprite: 24, delay: 150, left: 5 },
+    { sprite: 23, delay: 100, left: 10 }
 ])
 ```
 
@@ -194,41 +194,6 @@ Property | Type | Required | Default&nbsp;value | Explanation
 sprite | `number` | yes |  | Which sprite from spritesheet to show (counted from top-left to bottom-right)
 delay | `number` | no | delay defined with .play() | Time in ms to wait after this frame has been rendered
 top bottom left right | `number` | no | 0 | Move the position of the placeholder to any direction after frame has been rendered
-
-## .setTempo( tempo: `number`)
-Set playback tempo, double-speed = 2, half-speed = .5 (default:1)
-
-```js
-spriteling.setTempo(2)
-```
-
-## .getTempo(): `number`
-Get playback tempo, double-speed = 2, half-speed = .5 (default:1)
-
-```js
-const tempo = spriteling.getTempo()
-```
-
-## .next()
-Step the animation ahead one frame
-
-```js
-spriteling.next()
-```
-
-## .previous()
-Step the animation backwards one frame
-
-```js
-spriteling.previous()
-```
-
-## .goTo(frame: `number`): `boolean`
-Jump to certain frame within current animation sequence. Returns true if succeeded.
-
-```js
-spriteling.goTo(10)
-```
 
 ## .play(scriptName: `string`, options: `AnimationOptions`)
 Resume/play current or given animation.
@@ -253,11 +218,11 @@ run | `number` | no | -1 | The number of times the animation should run, -1 = in
 delay | `number` | no | 50 | Default delay for all frames that don't have a delay set
 tempo | `number` | no | 1 | Timescale for all delays, double-speed = 2, half-speed = .5
 reversed | `boolean` | no | false | Direction of the animation head, true == backwards
-script | `Array<Frame>` | no | all frames | New animation sequence
+script | `Array<Frame>` | no | all frames | New unnamed animation sequence
 onPlay() | `function` | no |  | Callback called when animator starts playing
 onStop() | `function` | no | null | Callback called when animator stops playing
 onFrame() | `function` | no | null | Callback called when the new frame is rendered
-onOutOfView | `boolean` | no | false | Callback called when the placeholder is no longer in view. Could be used to stop the animation when it moved out of the document boundary.
+onOutOfView() | `function` | no | null | Callback called when the placeholder is no longer in view. Could be used to stop the animation when it moved out of the document boundary.
 
 The callbacks allow for interactions between sprites to take place. In the following example sprite1 will trigger play() on sprite2 after it's animation has been completed:
 
@@ -294,6 +259,41 @@ Get the current play state
 
 ```js
 const isPlaying = spriteling.isPlaying()
+```
+
+## .setTempo( tempo: `number`)
+Set playback tempo, double-speed = 2, half-speed = .5 (default:1)
+
+```js
+spriteling.setTempo(2)
+```
+
+## .getTempo(): `number`
+Get playback tempo, double-speed = 2, half-speed = .5 (default:1)
+
+```js
+const tempo = spriteling.getTempo()
+```
+
+## .next()
+Step the animation ahead one frame
+
+```js
+spriteling.next()
+```
+
+## .previous()
+Step the animation backwards one frame
+
+```js
+spriteling.previous()
+```
+
+## .goTo(frame: `number`): `boolean`
+Jump to certain frame within current animation sequence. Returns true if succeeded.
+
+```js
+spriteling.goTo(10)
 ```
 
 ## .reverse()

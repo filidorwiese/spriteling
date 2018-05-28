@@ -280,6 +280,93 @@
                 _this.spriteSheet.animations[name] = script;
             };
             /**
+             * Resume/play current or given animation.
+             * Method can be called in four ways:
+             *
+             * .play() - resume current animation sequence (if not set - loops over all sprites once)
+             * .play(scriptName) - play given animation script
+             * .play(scriptName, { options }) - play given animation script with given options
+             * .play({ options }) - play current animation with given options
+             *
+             * ScriptName loads a previously added animation with .addScript()
+             *
+             * Options object can contain
+             * - play: start playing the animation right away (default: true)
+             * - run: the number of times the animation should run, -1 is infinite (default: 1)
+             * - delay: default delay for all frames that don't have a delay set (default: 50)
+             * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
+             * - reversed: direction of the animation head, true == backwards (default: false)
+             * - script: New unnamed animation sequence, array of frames, see .addScript (default: null)
+             * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
+             *
+             * @param {string | Animation} scriptName
+             * @param {Animation} options
+             * @returns {boolean}
+             */
+            this.play = function (scriptName, options) {
+                // Not yet loaded, wait...
+                if (!_this.spriteSheet.loaded) {
+                    setTimeout(function () {
+                        _this.play(scriptName, options);
+                    }, 50);
+                    return false;
+                }
+                // play()
+                if (!scriptName && !options) {
+                    // Play if not already playing
+                    if (!_this.playhead.play) {
+                        if (_this.playhead.run === 0) {
+                            _this.playhead.run = 1;
+                        }
+                        _this.playhead.play = true;
+                    }
+                }
+                else {
+                    var animationScript = void 0;
+                    var animationOptions = {};
+                    // play('someAnimation')
+                    if (typeof scriptName === 'string' && !options) {
+                        if (_this.spriteSheet.animations[scriptName]) {
+                            _this.log('info', "playing animation \"" + scriptName + "\"");
+                            animationScript = _this.spriteSheet.animations[scriptName];
+                        }
+                        else {
+                            _this.log('error', "animation \"" + scriptName + "\" not found");
+                        }
+                        // play('someAnimation', { options })
+                    }
+                    else if (typeof scriptName === 'string' && typeof options === 'object') {
+                        animationScript = _this.spriteSheet.animations[scriptName];
+                        animationOptions = options;
+                        // play({ options })
+                    }
+                    else if (typeof scriptName === 'object' && !options) {
+                        animationScript = _this.playhead.script;
+                        animationOptions = scriptName;
+                    }
+                    if (!animationScript) {
+                        _this.log('info', "playing animation \"all\"");
+                        animationScript = _this.spriteSheet.animations.all;
+                    }
+                    _this.playhead = __assign({}, playheadDefaults, { script: animationScript }, animationOptions);
+                }
+                // Enter the animation loop
+                if (_this.playhead.run !== 0) {
+                    _this.loop();
+                }
+                // onPlay callback
+                if (typeof _this.playhead.onPlay === 'function') {
+                    _this.playhead.onPlay();
+                }
+            };
+            /**
+             * Get the current play state
+             * @returns {boolean}
+             */
+            this.isPlaying = function () {
+                return _this.playhead.play;
+            };
+            /**
              * Set playback tempo, double-speed = 2, half-speed = .5 (default:1)
              * @param {number} tempo
              */
@@ -351,92 +438,6 @@
                 }
                 _this.log('info', 'frame: ' + _this.playhead.currentFrame + ', sprite: ' + frame.sprite);
                 return _this.drawFrame(frame);
-            };
-            /**
-             * Resume/play current or given animation.
-             * Method can be called in four ways:
-             *
-             * .play() - resume current animation sequence (if not set - loops over all sprites once)
-             * .play(scriptName) - play given animation script
-             * .play(scriptName, { options }) - play given animation script with given options
-             * .play({ options }) - play current animation with given options
-             *
-             * ScriptName loads a previously added animation with .addScript()
-             *
-             * Options object can contain
-             * - play: start playing the animation right away (default: true)
-             * - run: the number of times the animation should run, -1 is infinite (default: 1)
-             * - delay: default delay for all frames that don't have a delay set (default: 50)
-             * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
-             * - reversed: direction of the animation head, true == backwards (default: false)
-             * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
-             *
-             * @param {string | Animation} scriptName
-             * @param {Animation} options
-             * @returns {boolean}
-             */
-            this.play = function (scriptName, options) {
-                // Not yet loaded, wait...
-                if (!_this.spriteSheet.loaded) {
-                    setTimeout(function () {
-                        _this.play(scriptName, options);
-                    }, 50);
-                    return false;
-                }
-                // play()
-                if (!scriptName && !options) {
-                    // Play if not already playing
-                    if (!_this.playhead.play) {
-                        if (_this.playhead.run === 0) {
-                            _this.playhead.run = 1;
-                        }
-                        _this.playhead.play = true;
-                    }
-                }
-                else {
-                    var animationScript = void 0;
-                    var animationOptions = {};
-                    // play('someAnimation')
-                    if (typeof scriptName === 'string' && !options) {
-                        if (_this.spriteSheet.animations[scriptName]) {
-                            _this.log('info', "playing animation \"" + scriptName + "\"");
-                            animationScript = _this.spriteSheet.animations[scriptName];
-                        }
-                        else {
-                            _this.log('error', "animation \"" + scriptName + "\" not found");
-                        }
-                        // play('someAnimation', { options })
-                    }
-                    else if (typeof scriptName === 'string' && typeof options === 'object') {
-                        animationScript = _this.spriteSheet.animations[scriptName];
-                        animationOptions = options;
-                        // play({ options })
-                    }
-                    else if (typeof scriptName === 'object' && !options) {
-                        animationScript = _this.playhead.script;
-                        animationOptions = scriptName;
-                    }
-                    if (!animationScript) {
-                        _this.log('info', "playing animation \"all\"");
-                        animationScript = _this.spriteSheet.animations.all;
-                    }
-                    _this.playhead = __assign({}, playheadDefaults, { script: animationScript }, animationOptions);
-                }
-                // Enter the animation loop
-                if (_this.playhead.run !== 0) {
-                    _this.loop();
-                }
-                // onPlay callback
-                if (typeof _this.playhead.onPlay === 'function') {
-                    _this.playhead.onPlay();
-                }
-            };
-            /**
-             * Get the current play state
-             * @returns {boolean}
-             */
-            this.isPlaying = function () {
-                return _this.playhead.play;
             };
             /**
              * Reverse direction of play

@@ -29,14 +29,13 @@
       top: y
     })
 
-    sprite.addScript('run', [
-      {sprite: 1, left: 15},
-      {sprite: 2, left: 15},
-      {sprite: 3, left: 15},
-      {sprite: 4, left: 15}
-    ])
-
-    sprite.play('run', {
+    sprite.play({
+      script: [
+        {sprite: 1, left: 15},
+        {sprite: 2, left: 15},
+        {sprite: 3, left: 15},
+        {sprite: 4, left: 15}
+      ],
       onOutOfView: () => {
         sprite.destroy()
       }
