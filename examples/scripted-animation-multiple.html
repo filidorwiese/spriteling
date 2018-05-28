@@ -26,8 +26,7 @@
       rows: 1,
       delay: 120,
       left: -100,
-      top: y,
-      outOfViewStop: true
+      top: y
     })
 
     sprite.addScript('run', [
@@ -37,7 +36,11 @@
       {sprite: 4, left: 15}
     ])
 
-    sprite.play('run')
+    sprite.play('run', {
+      onOutOfView: () => {
+        sprite.destroy()
+      }
+    })
   }
 
   document.querySelector('#plusone').addEventListener('click', function () {

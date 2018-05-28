@@ -253,11 +253,11 @@ run | `number` | no | -1 | The number of times the animation should run, -1 = in
 delay | `number` | no | 50 | Default delay for all frames that don't have a delay set
 tempo | `number` | no | 1 | Timescale for all delays, double-speed = 2, half-speed = .5
 reversed | `boolean` | no | false | Direction of the animation head, true == backwards
-outOfViewStop | `boolean` | no | false | Stop animation if placeholder is no longer in view
 script | `Array<Frame>` | no | all frames | New animation sequence
 onPlay() | `function` | no |  | Callback called when animator starts playing
 onStop() | `function` | no | null | Callback called when animator stops playing
 onFrame() | `function` | no | null | Callback called when the new frame is rendered
+onOutOfView | `boolean` | no | false | Callback called when the placeholder is no longer in view. Could be used to stop the animation when it moved out of the document boundary.
 
 The callbacks allow for interactions between sprites to take place. In the following example sprite1 will trigger play() on sprite2 after it's animation has been completed:
 

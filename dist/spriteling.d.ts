@@ -90,8 +90,7 @@ declare class Spriteling {
      * - delay: default delay for all frames that don't have a delay set (default: 50)
      * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
      * - reversed: direction of the animation head, true == backwards (default: false)
-     * - outOfViewStop: stop animation if placeholder is no longer in view (default: false)
-     * - onPlay/onStop/onFrame: callbacks called at the appropriate times (default: null)
+     * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
      *
      * @param {string | Animation} scriptName
      * @param {Animation} options

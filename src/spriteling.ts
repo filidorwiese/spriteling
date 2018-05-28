@@ -8,7 +8,6 @@ const playheadDefaults: Animation = {
   tempo: 1,
   run: -1,
   reversed: false,
-  outOfViewStop: false,
   script: [],
   lastTime: 0,
   nextDelay: 0,
@@ -16,7 +15,8 @@ const playheadDefaults: Animation = {
   currentSprite: 1,
   onPlay: null,
   onStop: null,
-  onFrame: null
+  onFrame: null,
+  onOutOfView: null
 }
 
 class Spriteling {
@@ -245,8 +245,7 @@ class Spriteling {
    * - delay: default delay for all frames that don't have a delay set (default: 50)
    * - tempo: timescale for all delays, double-speed = 2, half-speed = .5 (default:1)
    * - reversed: direction of the animation head, true == backwards (default: false)
-   * - outOfViewStop: stop animation if placeholder is no longer in view (default: false)
-   * - onPlay/onStop/onFrame: callbacks called at the appropriate times (default: null)
+   * - onPlay/onStop/onFrame/onOutOfView: callbacks called at the appropriate times (default: null)
    *
    * @param {string | Animation} scriptName
    * @param {Animation} options
@@ -499,9 +498,11 @@ class Spriteling {
             }
 
           } else {
-            if (this.playhead.play && this.playhead.outOfViewStop) {
-              this.stop()
+
+            if (typeof this.playhead.onOutOfView === 'function') {
+              this.playhead.onOutOfView()
             }
+
           }
 
         }

@@ -37,11 +37,11 @@ export type AnimationOptions = {
   tempo?: number,
   run?: number,
   reversed?: boolean,
-  outOfViewStop?: boolean,
   script?: Frame[],
   onPlay?: () => void,
   onStop?: () => void,
-  onFrame?: (frameNumber: number) => void
+  onFrame?: (frameNumber: number) => void,
+  onOutOfView?: () => void
 }
 
 export type Animation = AnimationOptions & {
