@@ -615,13 +615,13 @@
                     _this.element.style.top = rect.top + frame.top + "px";
                 }
                 if (frame.right) {
-                    _this.element.style.top = rect.right + frame.right + "px";
+                    _this.element.style.right = rect.right + frame.right + "px";
                 }
                 if (frame.bottom) {
-                    _this.element.style.top = rect.bottom + frame.bottom + "px";
+                    _this.element.style.bottom = rect.bottom + frame.bottom + "px";
                 }
                 if (frame.left) {
-                    _this.element.style.top = rect.left + frame.left + "px";
+                    _this.element.style.left = rect.left + frame.left + "px";
                 }
                 // onFrame callback
                 if (typeof _this.playhead.onFrame === 'function') {
@@ -658,7 +658,9 @@
             }
             // No element found, let's create one instead
             if (!this.element) {
-                this.log('warn', "element \"" + element + "\" not found, created new element instead");
+                if (typeof this.element !== 'undefined') {
+                    this.log('warn', "element \"" + element + "\" not found, created new element instead");
+                }
                 this.element = document.createElement('div');
                 document.body.appendChild(this.element);
             }
