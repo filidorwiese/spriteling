@@ -111,7 +111,7 @@
 
     }).call(commonjsGlobal);
 
-    //# sourceMappingURL=performance-now.js.map
+
     });
 
     var root = typeof window === 'undefined' ? commonjsGlobal : window

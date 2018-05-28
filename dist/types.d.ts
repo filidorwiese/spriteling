@@ -1,14 +1,15 @@
 export declare type SpriteSheetOptions = {
     url: string;
-    cols: number;
-    rows: number;
-    cutOffFrames: number;
-    top: number | 'center';
-    bottom: number;
-    left: number | 'center';
-    right: number;
-    startSprite: number;
-    onLoaded: () => void;
+    cols?: number;
+    rows?: number;
+    cutOffFrames?: number;
+    top?: number | 'center';
+    bottom?: number;
+    left?: number | 'center';
+    right?: number;
+    startSprite?: number;
+    downsizeRatio?: number;
+    onLoaded?: () => void;
 };
 export declare type SpriteSheet = SpriteSheetOptions & {
     loaded: boolean;
@@ -35,11 +36,11 @@ export declare type AnimationOptions = {
     tempo?: number;
     run?: number;
     reversed?: boolean;
-    outOfViewStop?: boolean;
     script?: Frame[];
     onPlay?: () => void;
     onStop?: () => void;
     onFrame?: (frameNumber: number) => void;
+    onOutOfView?: () => void;
 };
 export declare type Animation = AnimationOptions & {
     script: Frame[];
