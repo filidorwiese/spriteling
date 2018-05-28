@@ -434,7 +434,7 @@
                 // Draw frame
                 _this.playhead.currentFrame = frameNumber;
                 var frame = _this.playhead.script[_this.playhead.currentFrame];
-                if (frame !== undefined) {
+                if (typeof frame === undefined) {
                     return false;
                 }
                 _this.log('info', 'frame: ' + _this.playhead.currentFrame + ', sprite: ' + frame.sprite);

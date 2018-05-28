@@ -322,7 +322,7 @@ class Spriteling {
     // Draw frame
     this.playhead.currentFrame = frameNumber
     const frame = this.playhead.script[this.playhead.currentFrame]
-    if (frame !== undefined) {
+    if (typeof frame === undefined) {
       return false
     }
 
