@@ -31,6 +31,7 @@ class Spriteling {
     left: null,
     right: null,
     startSprite: 1,
+    downsizeRatio: 1,
     totalSprites: 0,
     sheetWidth: 0,
     sheetHeight: 0,
@@ -384,66 +385,72 @@ class Spriteling {
         return
       }
 
-      this.spriteSheet.loaded = true
+      const sheet = this.spriteSheet
+      const element = this.element
+      sheet.loaded = true
 
-      this.log('info', 'loaded: ' + this.spriteSheet.url + ', sprites ' + this.spriteSheet.cols + ' x ' +
-        this.spriteSheet.rows)
+      this.log('info', 'loaded: ' + sheet.url + ', sprites ' + sheet.cols + ' x ' +
+        sheet.rows)
 
-      this.spriteSheet.sheetWidth = preload.width
-      this.spriteSheet.sheetHeight = preload.height
-      this.spriteSheet.frameWidth = this.spriteSheet.sheetWidth / this.spriteSheet.cols
-      this.spriteSheet.frameHeight = this.spriteSheet.sheetHeight / this.spriteSheet.rows
-      this.spriteSheet.totalSprites = (this.spriteSheet.cols * this.spriteSheet.rows) - this.spriteSheet.cutOffFrames
+      sheet.sheetWidth = preload.width
+      sheet.sheetHeight = preload.height
+      sheet.frameWidth = sheet.sheetWidth / sheet.cols / sheet.downsizeRatio
+      sheet.frameHeight = sheet.sheetHeight / sheet.rows / sheet.downsizeRatio
+      sheet.totalSprites = (sheet.cols * sheet.rows) - sheet.cutOffFrames
 
-      if (this.spriteSheet.frameWidth % 1 !== 0) {
-        this.log('error', 'frameWidth ' + this.spriteSheet.frameWidth + ' is not a whole number')
+      if (sheet.frameWidth % 1 !== 0) {
+        this.log('error', 'frameWidth ' + sheet.frameWidth + ' is not a whole number')
       }
-      if (this.spriteSheet.frameHeight % 1 !== 0) {
-        this.log('error', 'frameHeight ' + this.spriteSheet.frameHeight + ' is not a whole number')
+      if (sheet.frameHeight % 1 !== 0) {
+        this.log('error', 'frameHeight ' + sheet.frameHeight + ' is not a whole number')
       }
 
-      this.element.style.position = 'absolute'
-      this.element.style.width = `${this.spriteSheet.frameWidth}px`
-      this.element.style.height = `${this.spriteSheet.frameHeight}px`
-      this.element.style.backgroundImage = `url(${this.spriteSheet.url})`
-      this.element.style.backgroundPosition = '0 0'
+      element.style.position = 'absolute'
+      element.style.width = `${sheet.frameWidth}px`
+      element.style.height = `${sheet.frameHeight}px`
+      element.style.backgroundImage = `url(${sheet.url})`
+      element.style.backgroundPosition = '0 0'
 
-      if (this.spriteSheet.top !== null) {
-        if (this.spriteSheet.top === 'center') {
-          this.element.style.top = '50%'
-          this.element.style.marginTop = `${this.spriteSheet.frameHeight / 2 * -1}px`
+      if (sheet.downsizeRatio > 1) {
+        element.style.backgroundSize = `${sheet.sheetWidth / sheet.downsizeRatio}px ${sheet.sheetHeight / sheet.downsizeRatio}px`
+      }
+
+      if (sheet.top !== null) {
+        if (sheet.top === 'center') {
+          element.style.top = '50%'
+          element.style.marginTop = `${sheet.frameHeight / 2 * -1}px`
         } else {
-          this.element.style.top = `${this.spriteSheet.top}px`
+          element.style.top = `${sheet.top}px`
         }
       }
-      if (this.spriteSheet.right !== null) {
-        this.element.style.right = `${this.spriteSheet.right}px`
+      if (sheet.right !== null) {
+        element.style.right = `${sheet.right}px`
       }
-      if (this.spriteSheet.bottom !== null) {
-        this.element.style.bottom = `${this.spriteSheet.bottom}px`
+      if (sheet.bottom !== null) {
+        element.style.bottom = `${sheet.bottom}px`
       }
-      if (this.spriteSheet.left !== null) {
-        if (this.spriteSheet.left === 'center') {
-          this.element.style.left = `${this.spriteSheet.left}px`
-          this.element.style.marginLeft = `${this.spriteSheet.frameWidth / 2 * -1}px`
+      if (sheet.left !== null) {
+        if (sheet.left === 'center') {
+          element.style.left = `${sheet.left}px`
+          element.style.marginLeft = `${sheet.frameWidth / 2 * -1}px`
         } else {
-          this.element.style.left = `${this.spriteSheet.left}px`
+          element.style.left = `${sheet.left}px`
         }
       }
 
       // Auto script the first 'all' animation sequence and make it default
       this.autoScript()
-      const animationOptions = {script: this.spriteSheet.animations.all}
+      const animationOptions = {script: sheet.animations.all}
       this.playhead = {...playheadDefaults, ...animationOptions}
 
       // Starting sprite?
-      if (this.spriteSheet.startSprite > 1 && this.spriteSheet.startSprite <= this.spriteSheet.totalSprites) {
-        this.showSprite(this.spriteSheet.startSprite)
+      if (sheet.startSprite > 1 && sheet.startSprite <= sheet.totalSprites) {
+        this.showSprite(sheet.startSprite)
       }
 
       // onLoaded callback
-      if (typeof this.spriteSheet.onLoaded === 'function') {
-        this.spriteSheet.onLoaded()
+      if (typeof sheet.onLoaded === 'function') {
+        sheet.onLoaded()
       }
     })
   }
@@ -465,43 +472,46 @@ class Spriteling {
   private loop = (time?: number) => {
     // Should be called as soon as possible
     const requestFrameId = raf(this.loop)
+    const sheet = this.spriteSheet
+    const playhead = this.playhead
+    const element = this.element
 
     // Wait until fully loaded
-    if (this.element !== null && this.spriteSheet.loaded) {
+    if (element !== null && sheet.loaded) {
 
       // Only play when not paused
-      if (this.playhead.play) {
+      if (playhead.play) {
 
         // Throttle on nextDelay
-        if ((time - this.playhead.lastTime) >= this.playhead.nextDelay) {
+        if ((time - playhead.lastTime) >= playhead.nextDelay) {
 
           // Render next frame only if element is visible and within viewport
-          if (this.element.offsetParent !== null && this.inViewport()) {
+          if (element.offsetParent !== null && this.inViewport()) {
 
             // Only play if run counter is still <> 0
-            if (this.playhead.run === 0) {
+            if (playhead.run === 0) {
               this.stop()
             } else {
 
-              if (this.playhead.reversed) {
+              if (playhead.reversed) {
                 this.previous()
               } else {
                 this.next()
               }
 
-              const frame = this.playhead.script[this.playhead.currentFrame]
-              this.playhead.nextDelay = (frame.delay ? frame.delay : this.playhead.delay)
-              this.playhead.nextDelay /= this.playhead.tempo
-              this.playhead.lastTime = time
+              const frame = playhead.script[playhead.currentFrame]
+              playhead.nextDelay = (frame.delay ? frame.delay : playhead.delay)
+              playhead.nextDelay /= playhead.tempo
+              playhead.lastTime = time
 
-              this.log('info', 'frame: ' + this.playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' +
-                this.playhead.nextDelay + ', run: ' + this.playhead.run)
+              this.log('info', 'frame: ' + playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' +
+                playhead.nextDelay + ', run: ' + playhead.run)
             }
 
           } else {
 
-            if (typeof this.playhead.onOutOfView === 'function') {
-              this.playhead.onOutOfView()
+            if (typeof playhead.onOutOfView === 'function') {
+              playhead.onOutOfView()
             }
 
           }
@@ -519,41 +529,47 @@ class Spriteling {
    * Draw a single frame
    */
   private drawFrame = (frame) => {
-    if (frame.sprite === this.playhead.currentSprite) {
+    const sheet = this.spriteSheet
+    const playhead = this.playhead
+    const element = this.element
+
+    if (frame.sprite === playhead.currentSprite) {
       return false
     }
-    this.playhead.currentSprite = frame.sprite
 
-    const rect = this.element.getBoundingClientRect()
-    const row = Math.ceil(frame.sprite / this.spriteSheet.cols)
-    const col = frame.sprite - ((row - 1) * this.spriteSheet.cols)
-    const bgX = ((col - 1) * this.spriteSheet.frameWidth) * -1
-    const bgY = ((row - 1) * this.spriteSheet.frameHeight) * -1
+    const rect = element.getBoundingClientRect()
+    const row = Math.ceil(frame.sprite / sheet.cols)
+    const col = frame.sprite - ((row - 1) * sheet.cols)
+    const bgX = ((col - 1) * sheet.frameWidth) * -1
+    const bgY = ((row - 1) * sheet.frameHeight) * -1
 
-    if (row > this.spriteSheet.rows || col > this.spriteSheet.cols) {
+    if (row > sheet.rows || col > sheet.cols) {
       this.log('error', `position ${frame.sprite} out of bound'`)
     }
 
+    // Set sprite
+    playhead.currentSprite = frame.sprite
+
     // Animate background
-    this.element.style.backgroundPosition = `${bgX}px ${bgY}px`
+    element.style.backgroundPosition = `${bgX}px ${bgY}px`
 
     // Move if indicated
     if (frame.top) {
-      this.element.style.top = `${rect.top + frame.top}px`
+      element.style.top = `${rect.top + frame.top}px`
     }
     if (frame.right) {
-      this.element.style.right = `${rect.right + frame.right}px`
+      element.style.right = `${rect.right + frame.right}px`
     }
     if (frame.bottom) {
-      this.element.style.bottom = `${rect.bottom + frame.bottom}px`
+      element.style.bottom = `${rect.bottom + frame.bottom}px`
     }
     if (frame.left) {
-      this.element.style.left = `${rect.left + frame.left}px`
+      element.style.left = `${rect.left + frame.left}px`
     }
 
     // onFrame callback
-    if (typeof this.playhead.onFrame === 'function') {
-      this.playhead.onFrame(this.playhead.currentFrame)
+    if (typeof playhead.onFrame === 'function') {
+      playhead.onFrame(playhead.currentFrame)
     }
 
     return true
@@ -564,12 +580,13 @@ class Spriteling {
    * @returns {boolean}
    */
   private inViewport = (): boolean => {
+    const sheet = this.spriteSheet
     const rect = this.element.getBoundingClientRect()
     return (
-      rect.top + this.spriteSheet.frameHeight >= 0 &&
-      rect.left + this.spriteSheet.frameWidth >= 0 &&
-      rect.bottom - this.spriteSheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
-      rect.right - this.spriteSheet.frameWidth <= (window.innerWidth || document.documentElement.clientWidth)
+      rect.top + sheet.frameHeight >= 0 &&
+      rect.left + sheet.frameWidth >= 0 &&
+      rect.bottom - sheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.right - sheet.frameWidth <= (window.innerWidth || document.documentElement.clientWidth)
     )
   }
 

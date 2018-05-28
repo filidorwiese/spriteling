@@ -1,15 +1,16 @@
 
 export type SpriteSheetOptions = {
   url: string,
-  cols: number,
-  rows: number,
-  cutOffFrames: number,
-  top: number | 'center',
-  bottom: number,
-  left: number | 'center',
-  right: number,
-  startSprite: number,
-  onLoaded: () => void
+  cols?: number,
+  rows?: number,
+  cutOffFrames?: number,
+  top?: number | 'center',
+  bottom?: number,
+  left?: number | 'center',
+  right?: number,
+  startSprite?: number,
+  downsizeRatio?: number,
+  onLoaded?: () => void
 }
 
 export type SpriteSheet = SpriteSheetOptions & {

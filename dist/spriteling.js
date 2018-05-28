@@ -240,6 +240,7 @@
                 left: null,
                 right: null,
                 startSprite: 1,
+                downsizeRatio: 1,
                 totalSprites: 0,
                 sheetWidth: 0,
                 sheetHeight: 0,
@@ -486,60 +487,65 @@
                     if (_this.spriteSheet.loaded) {
                         return;
                     }
-                    _this.spriteSheet.loaded = true;
-                    _this.log('info', 'loaded: ' + _this.spriteSheet.url + ', sprites ' + _this.spriteSheet.cols + ' x ' +
-                        _this.spriteSheet.rows);
-                    _this.spriteSheet.sheetWidth = preload.width;
-                    _this.spriteSheet.sheetHeight = preload.height;
-                    _this.spriteSheet.frameWidth = _this.spriteSheet.sheetWidth / _this.spriteSheet.cols;
-                    _this.spriteSheet.frameHeight = _this.spriteSheet.sheetHeight / _this.spriteSheet.rows;
-                    _this.spriteSheet.totalSprites = (_this.spriteSheet.cols * _this.spriteSheet.rows) - _this.spriteSheet.cutOffFrames;
-                    if (_this.spriteSheet.frameWidth % 1 !== 0) {
-                        _this.log('error', 'frameWidth ' + _this.spriteSheet.frameWidth + ' is not a whole number');
+                    var sheet = _this.spriteSheet;
+                    var element = _this.element;
+                    sheet.loaded = true;
+                    _this.log('info', 'loaded: ' + sheet.url + ', sprites ' + sheet.cols + ' x ' +
+                        sheet.rows);
+                    sheet.sheetWidth = preload.width;
+                    sheet.sheetHeight = preload.height;
+                    sheet.frameWidth = sheet.sheetWidth / sheet.cols / sheet.downsizeRatio;
+                    sheet.frameHeight = sheet.sheetHeight / sheet.rows / sheet.downsizeRatio;
+                    sheet.totalSprites = (sheet.cols * sheet.rows) - sheet.cutOffFrames;
+                    if (sheet.frameWidth % 1 !== 0) {
+                        _this.log('error', 'frameWidth ' + sheet.frameWidth + ' is not a whole number');
                     }
-                    if (_this.spriteSheet.frameHeight % 1 !== 0) {
-                        _this.log('error', 'frameHeight ' + _this.spriteSheet.frameHeight + ' is not a whole number');
+                    if (sheet.frameHeight % 1 !== 0) {
+                        _this.log('error', 'frameHeight ' + sheet.frameHeight + ' is not a whole number');
                     }
-                    _this.element.style.position = 'absolute';
-                    _this.element.style.width = _this.spriteSheet.frameWidth + "px";
-                    _this.element.style.height = _this.spriteSheet.frameHeight + "px";
-                    _this.element.style.backgroundImage = "url(" + _this.spriteSheet.url + ")";
-                    _this.element.style.backgroundPosition = '0 0';
-                    if (_this.spriteSheet.top !== null) {
-                        if (_this.spriteSheet.top === 'center') {
-                            _this.element.style.top = '50%';
-                            _this.element.style.marginTop = _this.spriteSheet.frameHeight / 2 * -1 + "px";
+                    element.style.position = 'absolute';
+                    element.style.width = sheet.frameWidth + "px";
+                    element.style.height = sheet.frameHeight + "px";
+                    element.style.backgroundImage = "url(" + sheet.url + ")";
+                    element.style.backgroundPosition = '0 0';
+                    if (sheet.downsizeRatio > 1) {
+                        element.style.backgroundSize = sheet.sheetWidth / sheet.downsizeRatio + "px " + sheet.sheetHeight / sheet.downsizeRatio + "px";
+                    }
+                    if (sheet.top !== null) {
+                        if (sheet.top === 'center') {
+                            element.style.top = '50%';
+                            element.style.marginTop = sheet.frameHeight / 2 * -1 + "px";
                         }
                         else {
-                            _this.element.style.top = _this.spriteSheet.top + "px";
+                            element.style.top = sheet.top + "px";
                         }
                     }
-                    if (_this.spriteSheet.right !== null) {
-                        _this.element.style.right = _this.spriteSheet.right + "px";
+                    if (sheet.right !== null) {
+                        element.style.right = sheet.right + "px";
                     }
-                    if (_this.spriteSheet.bottom !== null) {
-                        _this.element.style.bottom = _this.spriteSheet.bottom + "px";
+                    if (sheet.bottom !== null) {
+                        element.style.bottom = sheet.bottom + "px";
                     }
-                    if (_this.spriteSheet.left !== null) {
-                        if (_this.spriteSheet.left === 'center') {
-                            _this.element.style.left = _this.spriteSheet.left + "px";
-                            _this.element.style.marginLeft = _this.spriteSheet.frameWidth / 2 * -1 + "px";
+                    if (sheet.left !== null) {
+                        if (sheet.left === 'center') {
+                            element.style.left = sheet.left + "px";
+                            element.style.marginLeft = sheet.frameWidth / 2 * -1 + "px";
                         }
                         else {
-                            _this.element.style.left = _this.spriteSheet.left + "px";
+                            element.style.left = sheet.left + "px";
                         }
                     }
                     // Auto script the first 'all' animation sequence and make it default
                     _this.autoScript();
-                    var animationOptions = { script: _this.spriteSheet.animations.all };
+                    var animationOptions = { script: sheet.animations.all };
                     _this.playhead = __assign({}, playheadDefaults, animationOptions);
                     // Starting sprite?
-                    if (_this.spriteSheet.startSprite > 1 && _this.spriteSheet.startSprite <= _this.spriteSheet.totalSprites) {
-                        _this.showSprite(_this.spriteSheet.startSprite);
+                    if (sheet.startSprite > 1 && sheet.startSprite <= sheet.totalSprites) {
+                        _this.showSprite(sheet.startSprite);
                     }
                     // onLoaded callback
-                    if (typeof _this.spriteSheet.onLoaded === 'function') {
-                        _this.spriteSheet.onLoaded();
+                    if (typeof sheet.onLoaded === 'function') {
+                        sheet.onLoaded();
                     }
                 });
             };
@@ -559,36 +565,39 @@
             this.loop = function (time) {
                 // Should be called as soon as possible
                 var requestFrameId = raf_1(_this.loop);
+                var sheet = _this.spriteSheet;
+                var playhead = _this.playhead;
+                var element = _this.element;
                 // Wait until fully loaded
-                if (_this.element !== null && _this.spriteSheet.loaded) {
+                if (element !== null && sheet.loaded) {
                     // Only play when not paused
-                    if (_this.playhead.play) {
+                    if (playhead.play) {
                         // Throttle on nextDelay
-                        if ((time - _this.playhead.lastTime) >= _this.playhead.nextDelay) {
+                        if ((time - playhead.lastTime) >= playhead.nextDelay) {
                             // Render next frame only if element is visible and within viewport
-                            if (_this.element.offsetParent !== null && _this.inViewport()) {
+                            if (element.offsetParent !== null && _this.inViewport()) {
                                 // Only play if run counter is still <> 0
-                                if (_this.playhead.run === 0) {
+                                if (playhead.run === 0) {
                                     _this.stop();
                                 }
                                 else {
-                                    if (_this.playhead.reversed) {
+                                    if (playhead.reversed) {
                                         _this.previous();
                                     }
                                     else {
                                         _this.next();
                                     }
-                                    var frame = _this.playhead.script[_this.playhead.currentFrame];
-                                    _this.playhead.nextDelay = (frame.delay ? frame.delay : _this.playhead.delay);
-                                    _this.playhead.nextDelay /= _this.playhead.tempo;
-                                    _this.playhead.lastTime = time;
-                                    _this.log('info', 'frame: ' + _this.playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' +
-                                        _this.playhead.nextDelay + ', run: ' + _this.playhead.run);
+                                    var frame = playhead.script[playhead.currentFrame];
+                                    playhead.nextDelay = (frame.delay ? frame.delay : playhead.delay);
+                                    playhead.nextDelay /= playhead.tempo;
+                                    playhead.lastTime = time;
+                                    _this.log('info', 'frame: ' + playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' +
+                                        playhead.nextDelay + ', run: ' + playhead.run);
                                 }
                             }
                             else {
-                                if (typeof _this.playhead.onOutOfView === 'function') {
-                                    _this.playhead.onOutOfView();
+                                if (typeof playhead.onOutOfView === 'function') {
+                                    playhead.onOutOfView();
                                 }
                             }
                         }
@@ -603,36 +612,40 @@
              * Draw a single frame
              */
             this.drawFrame = function (frame) {
-                if (frame.sprite === _this.playhead.currentSprite) {
+                var sheet = _this.spriteSheet;
+                var playhead = _this.playhead;
+                var element = _this.element;
+                if (frame.sprite === playhead.currentSprite) {
                     return false;
                 }
-                _this.playhead.currentSprite = frame.sprite;
-                var rect = _this.element.getBoundingClientRect();
-                var row = Math.ceil(frame.sprite / _this.spriteSheet.cols);
-                var col = frame.sprite - ((row - 1) * _this.spriteSheet.cols);
-                var bgX = ((col - 1) * _this.spriteSheet.frameWidth) * -1;
-                var bgY = ((row - 1) * _this.spriteSheet.frameHeight) * -1;
-                if (row > _this.spriteSheet.rows || col > _this.spriteSheet.cols) {
+                var rect = element.getBoundingClientRect();
+                var row = Math.ceil(frame.sprite / sheet.cols);
+                var col = frame.sprite - ((row - 1) * sheet.cols);
+                var bgX = ((col - 1) * sheet.frameWidth) * -1;
+                var bgY = ((row - 1) * sheet.frameHeight) * -1;
+                if (row > sheet.rows || col > sheet.cols) {
                     _this.log('error', "position " + frame.sprite + " out of bound'");
                 }
+                // Set sprite
+                playhead.currentSprite = frame.sprite;
                 // Animate background
-                _this.element.style.backgroundPosition = bgX + "px " + bgY + "px";
+                element.style.backgroundPosition = bgX + "px " + bgY + "px";
                 // Move if indicated
                 if (frame.top) {
-                    _this.element.style.top = rect.top + frame.top + "px";
+                    element.style.top = rect.top + frame.top + "px";
                 }
                 if (frame.right) {
-                    _this.element.style.right = rect.right + frame.right + "px";
+                    element.style.right = rect.right + frame.right + "px";
                 }
                 if (frame.bottom) {
-                    _this.element.style.bottom = rect.bottom + frame.bottom + "px";
+                    element.style.bottom = rect.bottom + frame.bottom + "px";
                 }
                 if (frame.left) {
-                    _this.element.style.left = rect.left + frame.left + "px";
+                    element.style.left = rect.left + frame.left + "px";
                 }
                 // onFrame callback
-                if (typeof _this.playhead.onFrame === 'function') {
-                    _this.playhead.onFrame(_this.playhead.currentFrame);
+                if (typeof playhead.onFrame === 'function') {
+                    playhead.onFrame(playhead.currentFrame);
                 }
                 return true;
             };
@@ -641,11 +654,12 @@
              * @returns {boolean}
              */
             this.inViewport = function () {
+                var sheet = _this.spriteSheet;
                 var rect = _this.element.getBoundingClientRect();
-                return (rect.top + _this.spriteSheet.frameHeight >= 0 &&
-                    rect.left + _this.spriteSheet.frameWidth >= 0 &&
-                    rect.bottom - _this.spriteSheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
-                    rect.right - _this.spriteSheet.frameWidth <= (window.innerWidth || document.documentElement.clientWidth));
+                return (rect.top + sheet.frameHeight >= 0 &&
+                    rect.left + sheet.frameWidth >= 0 &&
+                    rect.bottom - sheet.frameHeight <= (window.innerHeight || document.documentElement.clientHeight) &&
+                    rect.right - sheet.frameWidth <= (window.innerWidth || document.documentElement.clientWidth));
             };
             /**
              * Log utility method

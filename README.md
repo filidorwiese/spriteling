@@ -148,6 +148,7 @@ rows | `number` | yes | null | Number of rows in the spritesheet
 cutOffFrames | `number` | no | 0 | Number of sprites not used in the spritesheet, for example the last sprite in a sheet might be blank
 top bottom left right | `number` | no |  | Initial position of the placeholder element, will use current if not provided
 startSprite | `number` | no | 1 | Sprite number to show when done loading
+downsizeRatio | `number` | no | 1 | For HiDPI or Retina support, you can supply a higher resolution spritesheet (x2) and downsize it back to regular size with this property
 onLoaded | `function` | no | null | Callback function that will be called when loading has finished
 
 #### element: `HTMLElement | string` (optional)
