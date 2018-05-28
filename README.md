@@ -324,6 +324,13 @@ Reset playhead to first frame
 spriteling.reset()
 ```
 
+## .destroy()
+Removes the element and kills the animation loop
+
+```js
+spriteling.destroy()
+```
+
 
 # Compatibility
 

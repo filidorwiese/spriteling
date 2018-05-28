@@ -121,6 +121,10 @@ declare class Spriteling {
      */
     reset: () => void;
     /**
+     * Removes the element and kills the animation loop
+     */
+    destroy: () => void;
+    /**
      * Load the spritesheet and position it correctly
      */
     private loadSpriteSheet;

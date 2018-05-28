@@ -111,7 +111,7 @@
 
     }).call(commonjsGlobal);
 
-
+    //# sourceMappingURL=performance-now.js.map
     });
 
     var root = typeof window === 'undefined' ? commonjsGlobal : window
@@ -467,6 +467,13 @@
              */
             this.reset = function () {
                 _this.goTo(0);
+            };
+            /**
+             * Removes the element and kills the animation loop
+             */
+            this.destroy = function () {
+                _this.playhead.play = false;
+                _this.element.parentNode.removeChild(_this.element);
             };
             /**
              * Load the spritesheet and position it correctly

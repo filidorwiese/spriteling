@@ -364,6 +364,14 @@ class Spriteling {
   }
 
   /**
+   * Removes the element and kills the animation loop
+   */
+  public destroy = () => {
+    this.playhead.play = false
+    this.element.parentNode.removeChild(this.element)
+  }
+
+  /**
    * Load the spritesheet and position it correctly
    */
   private loadSpriteSheet = () => {
