@@ -12,7 +12,7 @@ export declare type SpriteSheetOptions = {
     onLoaded?: () => void;
 };
 export declare type SpriteSheet = SpriteSheetOptions & {
-    loaded: boolean;
+    loaded: Promise<{}>;
     totalSprites: number;
     sheetWidth: number;
     sheetHeight: number;

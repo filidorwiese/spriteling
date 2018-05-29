@@ -71,7 +71,7 @@ declare class Spriteling {
      * @param {Animation} options
      * @returns {boolean}
      */
-    play: (scriptName?: string | AnimationOptions, options?: AnimationOptions) => boolean;
+    play(scriptName?: string | AnimationOptions, options?: AnimationOptions): Promise<void>;
     /**
      * Get the current play state
      * @returns {boolean}

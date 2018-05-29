@@ -1,9 +1,11 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "moduleResolution": "node",
-    "outDir": "build/compiled",
-    "declaration": true
+    "lib": [
+      "dom",
+      "es5",
+      "es2015.promise"
+    ]
   },
   "include": [
     "src"
