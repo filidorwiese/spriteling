@@ -326,7 +326,7 @@ class Spriteling {
       return false
     }
 
-    this.log('info', 'frame: ' + this.playhead.currentFrame + ', sprite: ' + frame.sprite)
+    this.log('info', `frame: ${this.playhead.currentFrame}, sprite: ${frame.sprite}`)
     return this.drawFrame(frame)
   }
 
@@ -389,8 +389,7 @@ class Spriteling {
       const element = this.element
       sheet.loaded = true
 
-      this.log('info', 'loaded: ' + sheet.url + ', sprites ' + sheet.cols + ' x ' +
-        sheet.rows)
+      this.log('info', `loaded: ${sheet.url}, sprites ${sheet.cols} x ${sheet.rows}`)
 
       sheet.sheetWidth = preload.width
       sheet.sheetHeight = preload.height
@@ -399,10 +398,10 @@ class Spriteling {
       sheet.totalSprites = (sheet.cols * sheet.rows) - sheet.cutOffFrames
 
       if (sheet.frameWidth % 1 !== 0) {
-        this.log('error', 'frameWidth ' + sheet.frameWidth + ' is not a whole number')
+        this.log('error', `frameWidth ${sheet.frameWidth} is not a whole number`)
       }
       if (sheet.frameHeight % 1 !== 0) {
-        this.log('error', 'frameHeight ' + sheet.frameHeight + ' is not a whole number')
+        this.log('error', `frameHeight ${sheet.frameHeight} is not a whole number`)
       }
 
       element.style.position = 'absolute'
@@ -504,8 +503,7 @@ class Spriteling {
               playhead.nextDelay /= playhead.tempo
               playhead.lastTime = time
 
-              this.log('info', 'frame: ' + playhead.currentFrame + ', sprite: ' + frame.sprite + ', delay: ' +
-                playhead.nextDelay + ', run: ' + playhead.run)
+              this.log('info', `frame: ${playhead.currentFrame}, sprite: ${frame.sprite}, delay: ${playhead.nextDelay}, run: ${playhead.run}`)
             }
 
           } else {
