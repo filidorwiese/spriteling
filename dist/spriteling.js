@@ -1767,11 +1767,11 @@
                             // Draw frame
                             this.playhead.currentFrame = frameNumber;
                             frame = this.playhead.script[this.playhead.currentFrame];
-                            if (typeof frame === undefined) {
-                                return [2 /*return*/, false];
+                            if (frame) {
+                                this.log('info', "frame: " + this.playhead.currentFrame + ", sprite: " + frame.sprite);
+                                this.drawFrame(frame);
                             }
-                            this.log('info', "frame: " + this.playhead.currentFrame + ", sprite: " + frame.sprite);
-                            return [2 /*return*/, this.drawFrame(frame)];
+                            return [2 /*return*/];
                     }
                 });
             });
