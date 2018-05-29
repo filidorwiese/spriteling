@@ -1,3 +1,4 @@
+import 'es6-promise'
 import imageLoaded from 'image-loaded'
 import raf from 'raf'
 import {Animation, AnimationOptions, Frame, SpriteSheet, SpriteSheetOptions} from './types'
@@ -11,7 +12,7 @@ const playheadDefaults: Animation = {
   script: [],
   lastTime: 0,
   nextDelay: 0,
-  currentFrame: -1,
+  currentFrame: 0,
   currentSprite: 1,
   onPlay: null,
   onStop: null,
@@ -46,6 +47,8 @@ class Spriteling {
   private readonly element: HTMLElement
 
   private debug: boolean
+
+  private loadingPromise: Promise<void>
 
   /**
    * Creates a new Spriteling instance. The options object can contain the following values
@@ -107,14 +110,28 @@ class Spriteling {
       }
     }
 
-    this.loadSpriteSheet()
+    // Create loading promise
+    this.loadingPromise = this.loadSpriteSheet().then(() => {
+      this.spriteSheet.loaded = true
+
+      // If starting sprite is set, show it
+      if (this.spriteSheet.startSprite > 1 && this.spriteSheet.startSprite <= this.spriteSheet.totalSprites) {
+        this.drawFrame({sprite: this.spriteSheet.startSprite })
+      }
+
+      // onLoaded callback
+      if (typeof this.spriteSheet.onLoaded === 'function') {
+        this.spriteSheet.onLoaded()
+      }
+    })
   }
 
   /**
    * Stop the current animation and show the specified sprite
    * @param {number} spriteNumber
    */
-  public showSprite = (spriteNumber: number) => {
+  public async showSprite(spriteNumber: number) {
+    await this.loadingPromise
     this.playhead.play = false
     this.drawFrame({sprite: spriteNumber})
   }
@@ -123,7 +140,7 @@ class Spriteling {
    * Get the current spriteNumber that is shown
    * @returns {number}
    */
-  public currentSprite = (): number => {
+  public currentSprite(): number {
     return this.playhead.currentSprite
   }
 
@@ -140,7 +157,7 @@ class Spriteling {
    * @param {string} name
    * @param {Frame[]} script
    */
-  public addScript = (name: string, script: Frame[]) => {
+  public addScript(name: string, script: Frame[]) {
     this.spriteSheet.animations[name] = script
   }
 
@@ -168,17 +185,11 @@ class Spriteling {
    * @param {Animation} options
    * @returns {boolean}
    */
-  public play = (
+  public async play(
     scriptName?: string | AnimationOptions,
     options?: AnimationOptions
-  ) => {
-    // Not yet loaded, wait...
-    if (!this.spriteSheet.loaded) {
-      setTimeout(() => {
-        this.play(scriptName, options)
-      }, 50)
-      return false
-    }
+  ) {
+    await this.loadingPromise
 
     // play()
     if (!scriptName && !options) {
@@ -241,7 +252,7 @@ class Spriteling {
    * Get the current play state
    * @returns {boolean}
    */
-  public isPlaying = (): boolean => {
+  public isPlaying(): boolean {
     return this.playhead.play
   }
 
@@ -249,7 +260,8 @@ class Spriteling {
    * Set playback tempo, double-speed = 2, half-speed = .5 (default:1)
    * @param {number} tempo
    */
-  public setTempo = (tempo: number) => {
+  public async setTempo(tempo: number) {
+    await this.loadingPromise
     this.playhead.tempo = tempo
   }
 
@@ -257,7 +269,7 @@ class Spriteling {
    * Get playback tempo, double-speed = 2, half-speed = .5 (default:1)
    * @returns {number}
    */
-  public getTempo = (): number => {
+  public getTempo(): number {
     return this.playhead.tempo
   }
 
@@ -265,34 +277,33 @@ class Spriteling {
    * Step the animation ahead one frame
    * @returns {boolean}
    */
-  public next = (): boolean => {
-    if (!this.spriteSheet.loaded) {
-      return false
-    }
+  public async next() {
+    await this.loadingPromise
 
-    // Update counter
+    const frame = this.playhead.script[this.playhead.currentFrame]
+    this.drawFrame(frame)
+
+    // Update frame counter
     this.playhead.currentFrame += 1
-    if (this.playhead.currentFrame > (this.playhead.script.length - 1)) {
+    if (this.playhead.currentFrame > this.playhead.script.length - 1) {
       this.playhead.currentFrame = 0
     }
     if (this.playhead.currentFrame === this.playhead.script.length - 1) {
       this.playhead.run -= 1
     }
-
-    const frame = this.playhead.script[this.playhead.currentFrame]
-    return this.drawFrame(frame)
   }
 
   /**
    * Step the animation backwards one frame
    * @returns {boolean}
    */
-  public previous = (): boolean => {
-    if (!this.spriteSheet.loaded) {
-      return false
-    }
+  public async previous() {
+    await this.loadingPromise
 
-    // Update counter
+    const frame = this.playhead.script[this.playhead.currentFrame]
+    this.drawFrame(frame)
+
+    // Update frame counter
     this.playhead.currentFrame -= 1
     if (this.playhead.currentFrame < 0) {
       this.playhead.currentFrame = (this.playhead.script.length - 1)
@@ -300,9 +311,6 @@ class Spriteling {
     if (this.playhead.currentFrame === 0) {
       this.playhead.run -= 1
     }
-
-    const frame = this.playhead.script[this.playhead.currentFrame]
-    return this.drawFrame(frame)
   }
 
   /**
@@ -310,10 +318,8 @@ class Spriteling {
    * @param frameNumber [integer]
    * @returns {boolean}
    */
-  public goTo = (frameNumber: number): boolean => {
-    if (!this.spriteSheet.loaded) {
-      return false
-    }
+  public async goTo(frameNumber: number) {
+    await this.loadingPromise
 
     // Make sure given frame is within the animation
     const baseNumber = Math.floor(frameNumber / this.playhead.script.length)
@@ -333,7 +339,8 @@ class Spriteling {
   /**
    * Reverse direction of play
    */
-  public reverse = () => {
+  public async reverse() {
+    await this.loadingPromise
     this.playhead.reversed = !this.playhead.reversed
   }
 
@@ -341,14 +348,15 @@ class Spriteling {
    * Get the current direction of play
    * @returns {boolean}
    */
-  public isReversed = (): boolean => {
+  public isReversed(): boolean {
     return this.playhead.reversed
   }
 
   /**
    * Stop the animation
    */
-  public stop = () => {
+  public async stop() {
+    await this.loadingPromise
     this.playhead.play = false
 
     // onStop callback
@@ -360,14 +368,15 @@ class Spriteling {
   /**
    * Reset playhead to first frame
    */
-  public reset = () => {
+  public async reset() {
+    await this.loadingPromise
     this.goTo(0)
   }
 
   /**
    * Removes the element and kills the animation loop
    */
-  public destroy = () => {
+  public destroy() {
     this.playhead.play = false
     this.element.parentNode.removeChild(this.element)
   }
@@ -375,27 +384,23 @@ class Spriteling {
   /**
    * Load the spritesheet and position it correctly
    */
-  private loadSpriteSheet = () => {
-    const preload = new Image()
-    preload.src = this.spriteSheet.url
+  private loadSpriteSheet() {
+    return new Promise((resolve) => {
 
-    imageLoaded(preload, () => {
-      // Fix for some unexplained firefox bug that loads this twice.
-      if (this.spriteSheet.loaded) {
-        return
-      }
+      const preload = new Image()
+      preload.src = this.spriteSheet.url
 
-      const sheet = this.spriteSheet
-      const element = this.element
-      sheet.loaded = true
+      imageLoaded(preload, () => {
+        const sheet = this.spriteSheet
+        const element = this.element
 
-      this.log('info', `loaded: ${sheet.url}, sprites ${sheet.cols} x ${sheet.rows}`)
+        this.log('info', `loaded: ${sheet.url}, sprites ${sheet.cols} x ${sheet.rows}`)
 
-      sheet.sheetWidth = preload.width
-      sheet.sheetHeight = preload.height
-      sheet.frameWidth = sheet.sheetWidth / sheet.cols / sheet.downsizeRatio
-      sheet.frameHeight = sheet.sheetHeight / sheet.rows / sheet.downsizeRatio
-      sheet.totalSprites = (sheet.cols * sheet.rows) - sheet.cutOffFrames
+        sheet.sheetWidth = preload.width
+        sheet.sheetHeight = preload.height
+        sheet.frameWidth = sheet.sheetWidth / sheet.cols / sheet.downsizeRatio
+        sheet.frameHeight = sheet.sheetHeight / sheet.rows / sheet.downsizeRatio
+        sheet.totalSprites = (sheet.cols * sheet.rows) - sheet.cutOffFrames
 
       if (sheet.frameWidth % 1 !== 0) {
         this.log('error', `frameWidth ${sheet.frameWidth} is not a whole number`)
@@ -404,60 +409,53 @@ class Spriteling {
         this.log('error', `frameHeight ${sheet.frameHeight} is not a whole number`)
       }
 
-      element.style.position = 'absolute'
-      element.style.width = `${sheet.frameWidth}px`
-      element.style.height = `${sheet.frameHeight}px`
-      element.style.backgroundImage = `url(${sheet.url})`
-      element.style.backgroundPosition = '0 0'
+        element.style.position = 'absolute'
+        element.style.width = `${sheet.frameWidth}px`
+        element.style.height = `${sheet.frameHeight}px`
+        element.style.backgroundImage = `url(${sheet.url})`
+        element.style.backgroundPosition = '0 0'
 
-      if (sheet.downsizeRatio > 1) {
-        element.style.backgroundSize = `${sheet.sheetWidth / sheet.downsizeRatio}px ${sheet.sheetHeight / sheet.downsizeRatio}px`
-      }
-
-      if (sheet.top !== null) {
-        if (sheet.top === 'center') {
-          element.style.top = '50%'
-          element.style.marginTop = `${sheet.frameHeight / 2 * -1}px`
-        } else {
-          element.style.top = `${sheet.top}px`
+        if (sheet.downsizeRatio > 1) {
+          element.style.backgroundSize = `${sheet.sheetWidth / sheet.downsizeRatio}px ${sheet.sheetHeight / sheet.downsizeRatio}px`
         }
-      }
-      if (sheet.right !== null) {
-        element.style.right = `${sheet.right}px`
-      }
-      if (sheet.bottom !== null) {
-        element.style.bottom = `${sheet.bottom}px`
-      }
-      if (sheet.left !== null) {
-        if (sheet.left === 'center') {
-          element.style.left = `${sheet.left}px`
-          element.style.marginLeft = `${sheet.frameWidth / 2 * -1}px`
-        } else {
-          element.style.left = `${sheet.left}px`
+
+        if (sheet.top !== null) {
+          if (sheet.top === 'center') {
+            element.style.top = '50%'
+            element.style.marginTop = `${sheet.frameHeight / 2 * -1}px`
+          } else {
+            element.style.top = `${sheet.top}px`
+          }
         }
-      }
+        if (sheet.right !== null) {
+          element.style.right = `${sheet.right}px`
+        }
+        if (sheet.bottom !== null) {
+          element.style.bottom = `${sheet.bottom}px`
+        }
+        if (sheet.left !== null) {
+          if (sheet.left === 'center') {
+            element.style.left = `${sheet.left}px`
+            element.style.marginLeft = `${sheet.frameWidth / 2 * -1}px`
+          } else {
+            element.style.left = `${sheet.left}px`
+          }
+        }
 
-      // Auto script the first 'all' animation sequence and make it default
-      this.autoScript()
-      const animationOptions = {script: sheet.animations.all}
-      this.playhead = {...playheadDefaults, ...animationOptions}
+        // Auto script the first 'all' animation sequence and make it default
+        this.autoScript()
+        const animationOptions = {script: sheet.animations.all}
+        this.playhead = {...playheadDefaults, ...animationOptions}
 
-      // Starting sprite?
-      if (sheet.startSprite > 1 && sheet.startSprite <= sheet.totalSprites) {
-        this.showSprite(sheet.startSprite)
-      }
-
-      // onLoaded callback
-      if (typeof sheet.onLoaded === 'function') {
-        sheet.onLoaded()
-      }
+        resolve()
+      })
     })
   }
 
   /**
    * Generate a linear script based on the spritesheet itself
    */
-  private autoScript = () => {
+  private autoScript() {
     const script = []
     for (let i = 0; i < this.spriteSheet.totalSprites; i++) {
       script[i] = {sprite: (i + 1)}
@@ -471,62 +469,66 @@ class Spriteling {
   private loop = (time?: number) => {
     // Should be called as soon as possible
     const requestFrameId = raf(this.loop)
-    const sheet = this.spriteSheet
     const playhead = this.playhead
-    const element = this.element
 
     // Wait until fully loaded
-    if (element !== null && sheet.loaded) {
+    if (!this.element || !this.spriteSheet.loaded) {
+      return
+    }
 
-      // Only play when not paused
-      if (playhead.play) {
+    // Cancel animation loop if play = false
+    if (!playhead.play) {
+      raf.cancel(requestFrameId)
+      return
+    }
 
-        // Throttle on nextDelay
-        if ((time - playhead.lastTime) >= playhead.nextDelay) {
+    // Throttle on nextDelay
+    if ((time - playhead.lastTime) >= playhead.nextDelay) {
+      this.render(time)
+    }
+  }
 
-          // Render next frame only if element is visible and within viewport
-          if (element.offsetParent !== null && this.inViewport()) {
+  private render(time?: number) {
+    const element = this.element
+    const playhead = this.playhead
 
-            // Only play if run counter is still <> 0
-            if (playhead.run === 0) {
-              this.stop()
-            } else {
+    // Render next frame only if element is visible and within viewport
+    if (element.offsetParent !== null && this.inViewport()) {
 
-              if (playhead.reversed) {
-                this.previous()
-              } else {
-                this.next()
-              }
+      // Only play if run counter is still <> 0
+      if (playhead.run === 0) {
 
-              const frame = playhead.script[playhead.currentFrame]
-              playhead.nextDelay = (frame.delay ? frame.delay : playhead.delay)
-              playhead.nextDelay /= playhead.tempo
-              playhead.lastTime = time
+        this.stop()
+
+      } else {
+
+        if (playhead.reversed) {
+          this.previous()
+        } else {
+          this.next()
+        }
+
+        const frame = playhead.script[playhead.currentFrame]
+        playhead.nextDelay = frame.delay ? frame.delay : playhead.delay
+        playhead.nextDelay /= playhead.tempo
+        playhead.lastTime = time
 
               this.log('info', `frame: ${playhead.currentFrame}, sprite: ${frame.sprite}, delay: ${playhead.nextDelay}, run: ${playhead.run}`)
             }
 
-          } else {
+    } else {
 
-            if (typeof playhead.onOutOfView === 'function') {
-              playhead.onOutOfView()
-            }
-
-          }
-
-        }
-
-      } else {
-        // Cancel animation loop if play = false
-        raf.cancel(requestFrameId)
+      if (typeof playhead.onOutOfView === 'function') {
+        playhead.onOutOfView()
       }
+
     }
   }
 
   /**
    * Draw a single frame
    */
-  private drawFrame = (frame) => {
+  private drawFrame(frame) {
     const sheet = this.spriteSheet
     const playhead = this.playhead
     const element = this.element
@@ -577,7 +579,7 @@ class Spriteling {
    * Test to see if an element is within the viewport
    * @returns {boolean}
    */
-  private inViewport = (): boolean => {
+  private inViewport(): boolean {
     const sheet = this.spriteSheet
     const rect = this.element.getBoundingClientRect()
     return (
@@ -594,7 +596,7 @@ class Spriteling {
    * @param message
    * @private
    */
-  private log = (level, message) => {
+  private log(level, message) {
     if (typeof console === 'undefined' || (level === 'info' && !this.debug)) {
       return
     }

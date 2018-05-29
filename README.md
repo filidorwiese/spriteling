@@ -1,6 +1,6 @@
 # Spriteling
 
-A scriptable spritesheet animation engine that works directly on DOM elements (no canvas). It's built as ES5 compatible JavaScript, has no external dependencies and a tiny footprint (~3KB minified/gzipped).
+A scriptable spritesheet animation engine that works directly on DOM elements (no canvas). It's built as ES5 compatible JavaScript, has no external dependencies and a tiny footprint (~6KB minified/gzipped).
 
 ### Install using node
 
