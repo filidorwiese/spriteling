@@ -6,6 +6,7 @@
   "scripts": {
     "develop": "rollup -w -c ./rollup.config.js",
     "build": "rollup -c ./rollup.config.js && rollup -c ./rollup.config.build.js",
+    "prepublish": "npm run build",
     "postversion": "git push --follow-tags"
   },
   "repository": {
