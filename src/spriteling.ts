@@ -92,7 +92,7 @@ class Spriteling {
     // Combine options with defaults
     this.spriteSheet = {...this.spriteSheet, ...options}
     this.playhead = {...playheadDefaults}
-    this.debug = debug
+    this.debug = debug || false
 
     // Initialize spritesheet
     if (!options.cols) {
@@ -415,7 +415,7 @@ class Spriteling {
       imageLoaded(preload, () => {
         const sheet = this.spriteSheet
         const element = this.element
-
+// console.log('@@@@', preload)
         this.log('info', `loaded: ${sheet.url}, sprites ${sheet.cols} x ${sheet.rows}`)
 
         sheet.sheetWidth = preload.width

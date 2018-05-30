@@ -9,7 +9,9 @@
     "develop": "rollup -w -c",
     "build": "rollup -c",
     "prepublishOnly": "npm run build",
-    "postversion": "git push --follow-tags"
+    "postversion": "git push --follow-tags",
+    "test": "jest",
+    "test:watch": "jest --watch"
   },
   "repository": {
     "type": "git",
@@ -30,10 +32,13 @@
   },
   "homepage": "https://github.com/filidorwiese/spriteling#readme",
   "devDependencies": {
+    "@types/jest": "22.2.3",
+    "jest": "23.0.1",
     "rollup-plugin-commonjs": "9.1.3",
     "rollup-plugin-node-resolve": "3.3.0",
     "rollup-plugin-typescript2": "0.14.0",
     "rollup-plugin-uglify": "4.0.0",
+    "ts-jest": "22.4.6",
     "typescript": "2.8.3"
   },
   "dependencies": {
