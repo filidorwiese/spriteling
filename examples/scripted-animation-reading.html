@@ -30,7 +30,7 @@
 </div>
 
 <script>
-  const sprite = new Spriteling({
+  var sprite = new Spriteling({
     url: './artwork/spritesheet-reading.png',
     top: 300,
     left: 150,
@@ -97,11 +97,11 @@
     sprite.reverse()
   })
   document.querySelector('#goTo').addEventListener('click', function () {
-    const frameNumber = document.getElementById('framenumber').value || 0
+    var frameNumber = document.getElementById('framenumber').value || 0
     sprite.goTo(frameNumber)
   })
   document.querySelector('#setTempo').addEventListener('click', function () {
-    const tempo = document.getElementById('tempo').value || 1
+    var tempo = document.getElementById('tempo').value || 1
     sprite.setTempo(tempo)
   })
 </script>
