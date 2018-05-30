@@ -17,9 +17,9 @@
 
 <script>
   function createSprite () {
-    const y = window.innerHeight * Math.random()
-    const url = Math.random() > .4 ? './artwork/spritesheet-ossy-bone.png' : './artwork/spritesheet-ossy-bone-float.png'
-    const sprite = new Spriteling({
+    var y = window.innerHeight * Math.random()
+    var url = Math.random() > .4 ? './artwork/spritesheet-ossy-bone.png' : './artwork/spritesheet-ossy-bone-float.png'
+    var sprite = new Spriteling({
       url: url,
       run: -1,
       cols: 4,
@@ -36,7 +36,7 @@
         {sprite: 3, left: 15},
         {sprite: 4, left: 15}
       ],
-      onOutOfView: () => {
+      onOutOfView: function() {
         sprite.destroy()
       }
     })

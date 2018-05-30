@@ -1,4 +1,4 @@
-import 'es6-promise'
+import 'es6-promise/auto'
 import imageLoaded from 'image-loaded'
 import raf from 'raf'
 import {Animation, AnimationOptions, Frame, SpriteSheet, SpriteSheetOptions} from './types'
