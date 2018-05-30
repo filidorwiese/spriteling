@@ -1602,7 +1602,7 @@
          */
         Spriteling.prototype.play = function (scriptName, options) {
             return __awaiter(this, void 0, void 0, function () {
-                var animationScript, animationOptions;
+                var animationScript, animationOptions, currentFrame;
                 return __generator(this, function (_a) {
                     switch (_a.label) {
                         case 0: return [4 /*yield*/, this.loadingPromise
@@ -1643,11 +1643,16 @@
                                     animationScript = this.playhead.script;
                                     animationOptions = scriptName;
                                 }
+                                // Fallback to all script
                                 if (!animationScript) {
                                     this.log('info', "playing animation \"all\"");
                                     animationScript = this.spriteSheet.animations.all;
                                 }
-                                this.playhead = __assign({}, playheadDefaults, { script: animationScript }, animationOptions);
+                                currentFrame = 0;
+                                if (animationOptions.reversed) {
+                                    currentFrame = animationScript.length - 1;
+                                }
+                                this.playhead = __assign({}, playheadDefaults, { script: animationScript }, animationOptions, { currentFrame: currentFrame });
                             }
                             // Enter the animation loop
                             if (this.playhead.run !== 0) {
@@ -1709,11 +1714,10 @@
                             this.drawFrame(frame);
                             // Update frame counter
                             this.playhead.currentFrame += 1;
-                            if (this.playhead.currentFrame > this.playhead.script.length - 1) {
-                                this.playhead.currentFrame = 0;
-                            }
-                            if (this.playhead.currentFrame === this.playhead.script.length - 1) {
+                            // End of script?
+                            if (this.playhead.currentFrame === this.playhead.script.length) {
                                 this.playhead.run -= 1;
+                                this.playhead.currentFrame = 0;
                             }
                             return [2 /*return*/];
                     }
@@ -1736,10 +1740,9 @@
                             this.drawFrame(frame);
                             // Update frame counter
                             this.playhead.currentFrame -= 1;
+                            // End of script?
                             if (this.playhead.currentFrame < 0) {
-                                this.playhead.currentFrame = (this.playhead.script.length - 1);
-                            }
-                            if (this.playhead.currentFrame === 0) {
+                                this.playhead.currentFrame = this.playhead.script.length - 1;
                                 this.playhead.run -= 1;
                             }
                             return [2 /*return*/];

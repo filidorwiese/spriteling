@@ -230,14 +230,23 @@ class Spriteling {
         animationOptions = scriptName
       }
 
+      // Fallback to all script
       if (!animationScript) {
         this.log('info', `playing animation "all"`)
         animationScript = this.spriteSheet.animations.all
       }
+
+      // Set starting frame
+      let currentFrame = 0
+      if (animationOptions.reversed) {
+        currentFrame = animationScript.length - 1
+      }
+
       this.playhead = {
         ...playheadDefaults,
         ...{script: animationScript},
-        ...animationOptions
+        ...animationOptions,
+        ...{currentFrame}
       }
     }
 
@@ -292,11 +301,11 @@ class Spriteling {
 
     // Update frame counter
     this.playhead.currentFrame += 1
-    if (this.playhead.currentFrame > this.playhead.script.length - 1) {
-      this.playhead.currentFrame = 0
-    }
-    if (this.playhead.currentFrame === this.playhead.script.length - 1) {
+
+    // End of script?
+    if (this.playhead.currentFrame === this.playhead.script.length) {
       this.playhead.run -= 1
+      this.playhead.currentFrame = 0
     }
   }
 
@@ -312,10 +321,10 @@ class Spriteling {
 
     // Update frame counter
     this.playhead.currentFrame -= 1
+
+    // End of script?
     if (this.playhead.currentFrame < 0) {
-      this.playhead.currentFrame = (this.playhead.script.length - 1)
-    }
-    if (this.playhead.currentFrame === 0) {
+      this.playhead.currentFrame = this.playhead.script.length - 1
       this.playhead.run -= 1
     }
   }
