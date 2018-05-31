@@ -89,6 +89,9 @@ class Spriteling {
       document.body.appendChild(this.element)
     }
 
+    // Add spriteling class
+    this.element.className = 'spriteling'
+
     // Combine options with defaults
     this.spriteSheet = {...this.spriteSheet, ...options}
     this.playhead = {...playheadDefaults}
@@ -105,7 +108,7 @@ class Spriteling {
       // If no sprite is specified try to use background-image
       const elementStyle = window.getComputedStyle(this.element)
       const cssBackgroundImage = elementStyle.getPropertyValue('background-image')
-      if (cssBackgroundImage === 'none') {
+      if (!cssBackgroundImage || cssBackgroundImage === 'none') {
         this.log('error', 'no spritesheet image found, please specify it with options.url or set as css background')
       } else {
         this.spriteSheet.url = cssBackgroundImage.replace(/"/g, '').replace(/url\(|\)$/ig, '')
@@ -218,7 +221,7 @@ class Spriteling {
           this.log('info', `playing animation "${scriptName}"`)
           animationScript = this.spriteSheet.animations[scriptName]
         } else {
-          this.log('error', `animation "${scriptName}" not found`)
+          this.log('warn', `animation "${scriptName}" not found`)
         }
 
         // play('someAnimation', { options })
@@ -415,7 +418,7 @@ class Spriteling {
       imageLoaded(preload, () => {
         const sheet = this.spriteSheet
         const element = this.element
-// console.log('@@@@', preload)
+
         this.log('info', `loaded: ${sheet.url}, sprites ${sheet.cols} x ${sheet.rows}`)
 
         sheet.sheetWidth = preload.width
@@ -569,7 +572,7 @@ class Spriteling {
     const bgY = ((row - 1) * sheet.frameHeight) * -1
 
     if (row > sheet.rows || col > sheet.cols) {
-      this.log('error', `position ${frame.sprite} out of bound'`)
+      this.log('warn', `position ${frame.sprite} out of bound'`)
     }
 
     // Set sprite
