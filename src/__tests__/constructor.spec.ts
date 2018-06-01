@@ -65,7 +65,9 @@ describe('Constructor', () => {
 
   it('should error when no spritesheet image is provided and background-image is not set', () => {
     const instance = new Spriteling({cols: 5, rows: 10}, '', true)
-    expect(console.error).toHaveBeenCalledWith('Spriteling', 'no spritesheet image found, please specify it with options.url or set as css background')
+    expect(console.error).toHaveBeenCalledWith(
+      'Spriteling', 'no spritesheet image found, please specify it with options.url or set as css background'
+    )
   })
 
   it('should error when no cols/rows are provided', () => {
@@ -144,7 +146,7 @@ describe('Constructor', () => {
       cols: 5,
       rows: 10
     })
-    expect(instance.spriteSheet.animations['all'].length).toEqual(50)
+    expect(instance.spriteSheet.animations.all.length).toEqual(50)
   })
 })
 

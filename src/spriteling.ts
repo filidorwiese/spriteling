@@ -74,10 +74,8 @@ class Spriteling {
     debug: boolean = false
   ) {
     // Lookup element by selector
-    if (typeof element === 'string') {
-      this.element = document.querySelector(element) as HTMLElement
-    } else if (element) {
-      this.element = element
+    if (element) {
+      this.element = typeof element === 'string' ? document.querySelector(element) as HTMLElement : element
     }
 
     // No element found, let's create one instead
