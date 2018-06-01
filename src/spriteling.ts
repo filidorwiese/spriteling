@@ -538,9 +538,7 @@ class Spriteling {
         playhead.nextDelay /= playhead.tempo
         playhead.lastTime = time
 
-        this.log('info',
-          `frame: ${playhead.currentFrame}, sprite: ${frame.sprite}, delay: ${playhead.nextDelay}, run: ${playhead.run}`
-        )
+        this.log('info', `run: ${playhead.run}, frame`, frame)
       }
 
     } else {
@@ -623,11 +621,11 @@ class Spriteling {
    * @param message
    * @private
    */
-  private log(level, message) {
+  private log(level, ...message) {
     if (typeof console === 'undefined' || (level === 'info' && !this.debug)) {
       return
     }
-    console[level](`Spriteling: ${message}`)
+    console[level](`Spriteling`, ...message)
   }
 }
 
