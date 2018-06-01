@@ -560,38 +560,38 @@ class Spriteling {
     const playhead = this.playhead
     const element = this.element
 
-    if (frame.sprite === playhead.currentSprite) {
-      return false
-    }
+    if (frame.sprite !== playhead.currentSprite) {
 
-    const rect = element.getBoundingClientRect()
-    const row = Math.ceil(frame.sprite / sheet.cols)
-    const col = frame.sprite - ((row - 1) * sheet.cols)
-    const bgX = ((col - 1) * sheet.frameWidth) * -1
-    const bgY = ((row - 1) * sheet.frameHeight) * -1
+      const rect = element.getBoundingClientRect()
+      const row = Math.ceil(frame.sprite / sheet.cols)
+      const col = frame.sprite - ((row - 1) * sheet.cols)
+      const bgX = ((col - 1) * sheet.frameWidth) * -1
+      const bgY = ((row - 1) * sheet.frameHeight) * -1
 
-    if (row > sheet.rows || col > sheet.cols) {
-      this.log('warn', `position ${frame.sprite} out of bound'`)
-    }
+      if (row > sheet.rows || col > sheet.cols) {
+        this.log('warn', `position ${frame.sprite} out of bound`)
+      }
 
-    // Set sprite
-    playhead.currentSprite = frame.sprite
+      // Set sprite
+      playhead.currentSprite = frame.sprite
 
-    // Animate background
-    element.style.backgroundPosition = `${bgX}px ${bgY}px`
+      // Animate background
+      element.style.backgroundPosition = `${bgX}px ${bgY}px`
 
-    // Move if indicated
-    if (frame.top) {
-      element.style.top = `${rect.top + frame.top}px`
-    }
-    if (frame.right) {
-      element.style.right = `${rect.right + frame.right}px`
-    }
-    if (frame.bottom) {
-      element.style.bottom = `${rect.bottom + frame.bottom}px`
-    }
-    if (frame.left) {
-      element.style.left = `${rect.left + frame.left}px`
+      // Move if indicated
+      if (frame.top) {
+        element.style.top = `${rect.top + frame.top}px`
+      }
+      if (frame.right) {
+        element.style.right = `${rect.right + frame.right}px`
+      }
+      if (frame.bottom) {
+        element.style.bottom = `${rect.bottom + frame.bottom}px`
+      }
+      if (frame.left) {
+        element.style.left = `${rect.left + frame.left}px`
+      }
+
     }
 
     // onFrame callback
