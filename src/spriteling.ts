@@ -231,7 +231,7 @@ class Spriteling {
 
         // play({ options })
       } else if (typeof scriptName === 'object' && !options) {
-        animationScript = this.playhead.script
+        animationScript = scriptName.script || this.playhead.script
         animationOptions = scriptName
       }
 
