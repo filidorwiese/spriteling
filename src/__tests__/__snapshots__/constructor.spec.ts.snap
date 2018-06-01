@@ -3,13 +3,13 @@
 exports[`Constructor should create new element when none is provided 1`] = `
 <div
   class="spriteling"
-  style="position: absolute; width: 10px; height: 10px; background-image: url(./some-image.png);"
+  style="position: absolute; width: 20px; height: 10px; background-image: url(./some-image.png);"
 />
 `;
 
 exports[`Constructor should create new element when selector returns zero results 1`] = `
 <div
   class="spriteling"
-  style="position: absolute; width: 10px; height: 10px; background-image: url(./some-image.png);"
+  style="position: absolute; width: 20px; height: 10px; background-image: url(./some-image.png);"
 />
 `;
