@@ -257,7 +257,7 @@ class Spriteling {
 
     // Enter the animation loop
     if (this.playhead.run !== 0) {
-      this.loop()
+      this.loop(0)
     }
 
     // onPlay callback
@@ -492,8 +492,7 @@ class Spriteling {
   /**
    * The animation loop
    */
-  private loop = (time?: number) => {
-    // Should be called as soon as possible
+  private loop = (time: number) => {
     const requestFrameId = raf(this.loop)
     const playhead = this.playhead
 
@@ -502,19 +501,19 @@ class Spriteling {
       return
     }
 
+    // Throttle on nextDelay
+    if ((time - playhead.lastTime) >= playhead.nextDelay) {
+      this.render(time)
+    }
+
     // Cancel animation loop if play = false
     if (!playhead.play) {
       raf.cancel(requestFrameId)
       return
     }
-
-    // Throttle on nextDelay
-    if ((time - playhead.lastTime) >= playhead.nextDelay) {
-      this.render(time)
-    }
   }
 
-  private render(time?: number) {
+  private render(time: number) {
     const element = this.element
     const playhead = this.playhead
 
