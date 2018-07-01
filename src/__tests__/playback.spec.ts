@@ -16,12 +16,13 @@ raf.default = jest.fn()
 raf.default.cancel = jest.fn()
 
 // Mock RAF to play x amount of frames
-const workingRaf = (framesToRender, delay) => {
+let workingRafTimeout
+const workingRaf = (framesToRender: number, delay: number) => {
   let time = 0
   return (a) => {
     if (framesToRender) {
       framesToRender--
-      setTimeout(() => {
+      workingRafTimeout = setTimeout(() => {
         a(time += delay)
       }, delay)
     }
@@ -180,7 +181,10 @@ describe('Playback', () => {
     it('should call onFrame when provided', async (done) => {
       await instance.play(myScriptName, {
         run: 1,
-        onFrame: done
+        onFrame: (currentFrame) => {
+          expect(currentFrame).toBe(0)
+          done()
+        }
       })
     })
 
@@ -220,7 +224,7 @@ describe('Playback', () => {
         {sprite: 3},
         {sprite: 4}
       ]
-      let counter = 1
+      let counter = 0
 
       raf.default.mockImplementation(workingRaf(4, delay))
 
@@ -228,10 +232,14 @@ describe('Playback', () => {
         run: 1,
         delay,
         script: simpleScript,
-        onFrame: () => {
-          expect(instance.playhead.currentSprite).toBe(counter++)
+        onFrame: (frameNumber) => {
+          expect(frameNumber).toBe(counter)
+          counter++
         },
-        onStop: done
+        onStop: () => {
+          clearTimeout(workingRafTimeout)
+          done()
+        }
       })
     })
 
@@ -243,7 +251,7 @@ describe('Playback', () => {
         {sprite: 3},
         {sprite: 4}
       ]
-      let counter = 4
+      let counter = 3
 
       raf.default.mockImplementation(workingRaf(4, delay))
 
@@ -252,10 +260,14 @@ describe('Playback', () => {
         delay,
         script: simpleScript,
         reversed: true,
-        onFrame: () => {
-          expect(instance.playhead.currentSprite).toBe(counter--)
+        onFrame: (frameNumber) => {
+          expect(frameNumber).toBe(counter)
+          counter--
         },
-        onStop: done
+        onStop: () => {
+          clearTimeout(workingRafTimeout)
+          done()
+        }
       })
     })
 
@@ -277,6 +289,7 @@ describe('Playback', () => {
         reversed: true,
         onStop: () => {
           setTimeout(() => {
+            clearTimeout(workingRafTimeout)
             expect(raf.default.cancel).toHaveBeenCalled()
             done()
           }, 100)
@@ -302,7 +315,10 @@ describe('Playback', () => {
         onFrame: (c) => {
           expect(instance.playhead.nextDelay).toBe(simpleScript[c].delay)
         },
-        onStop: done
+        onStop: () => {
+          clearTimeout(workingRafTimeout)
+          done()
+        }
       })
     })
 
@@ -326,7 +342,10 @@ describe('Playback', () => {
         onFrame: (c) => {
           expect(instance.playhead.nextDelay).toBe(simpleScript[c].delay / tempo)
         },
-        onStop: done
+        onStop: () => {
+          clearTimeout(workingRafTimeout)
+          done()
+        }
       })
     })
   })
@@ -357,9 +376,7 @@ describe('Playback', () => {
   })
 
   describe('next()', () => {
-    xit('should draw next frame', async () => {
-      instance.drawFrame = jest.fn()
-
+    it('should draw next frame', async () => {
       const simpleScript = [
         {sprite: 1, delay: 10},
         {sprite: 2, delay: 20},
@@ -367,22 +384,23 @@ describe('Playback', () => {
         {sprite: 4, delay: 40}
       ]
 
+      instance.drawFrame = jest.fn()
       await instance.play({
         play: false,
         run: 1,
         script: simpleScript
       })
 
+      await instance.next()
       expect(instance.drawFrame).toHaveBeenCalledWith({delay: 10, sprite: 1})
-
-      // await instance.next()
-      // expect(instance.drawFrame).toHaveBeenCalledWith({delay: 20, sprite: 2})
-      // await instance.next()
-      // expect(instance.drawFrame).toHaveBeenCalledWith({delay: 30, sprite: 3})
-      // await instance.next()
-      // expect(instance.drawFrame).toHaveBeenCalledWith({delay: 40, sprite: 4})
-      // await instance.next()
-      // expect(instance.drawFrame).toHaveBeenCalledWith({delay: 10, sprite: 1})
+      await instance.next()
+      expect(instance.drawFrame).toHaveBeenCalledWith({delay: 20, sprite: 2})
+      await instance.next()
+      expect(instance.drawFrame).toHaveBeenCalledWith({delay: 30, sprite: 3})
+      await instance.next()
+      expect(instance.drawFrame).toHaveBeenCalledWith({delay: 40, sprite: 4})
+      await instance.next()
+      expect(instance.drawFrame).toHaveBeenCalledWith({delay: 10, sprite: 1})
     })
   })
 
@@ -394,46 +412,47 @@ describe('Playback', () => {
         {sprite: 3, delay: 30},
         {sprite: 4, delay: 40}
       ]
+      instance.drawFrame = jest.fn()
       await instance.play({
         play: false,
         run: 1,
         script: simpleScript
       })
 
-      instance.drawFrame = jest.fn()
-      await instance.previous()
-      expect(instance.drawFrame).toHaveBeenCalledWith({delay: 10, sprite: 1})
       await instance.previous()
       expect(instance.drawFrame).toHaveBeenCalledWith({delay: 40, sprite: 4})
       await instance.previous()
       expect(instance.drawFrame).toHaveBeenCalledWith({delay: 30, sprite: 3})
       await instance.previous()
       expect(instance.drawFrame).toHaveBeenCalledWith({delay: 20, sprite: 2})
+      await instance.previous()
+      expect(instance.drawFrame).toHaveBeenCalledWith({delay: 10, sprite: 1})
     })
   })
 
-  xdescribe('goTo()', () => {
-    it('should', () => {
-    })
-  })
-
-  xdescribe('reverse()', () => {
-    it('should', () => {
-    })
-  })
-
-  xdescribe('isReversed()', () => {
-    it('should', () => {
-    })
-  })
-
-  xdescribe('stop()', () => {
-    it('should', () => {
-    })
-  })
-
-  xdescribe('reset()', () => {
-    it('should', () => {
-    })
-  })
+  // TODO
+  // xdescribe('goTo()', () => {
+  //   it('should', () => {
+  //   })
+  // })
+  //
+  // xdescribe('reverse()', () => {
+  //   it('should', () => {
+  //   })
+  // })
+  //
+  // xdescribe('isReversed()', () => {
+  //   it('should', () => {
+  //   })
+  // })
+  //
+  // xdescribe('stop()', () => {
+  //   it('should', () => {
+  //   })
+  // })
+  //
+  // xdescribe('reset()', () => {
+  //   it('should', () => {
+  //   })
+  // })
 })

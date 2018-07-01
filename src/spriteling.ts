@@ -87,7 +87,7 @@ class Spriteling {
     }
 
     // Add spriteling class
-    this.element.className = 'spriteling'
+    this.element.className += ' spriteling'
 
     // Combine options with defaults
     this.spriteSheet = {...this.spriteSheet, ...options}
