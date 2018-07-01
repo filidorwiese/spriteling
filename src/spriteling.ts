@@ -70,12 +70,14 @@ class Spriteling {
    */
   constructor(
     options: SpriteSheetOptions,
-    element: HTMLElement | string,
+    element?: HTMLElement | string,
     debug: boolean = false
   ) {
     // Lookup element by selector
-    if (element) {
-      this.element = typeof element === 'string' ? document.querySelector(element) : element
+    if (typeof element === 'string') {
+      this.element = document.querySelector(element) as HTMLElement
+    } else if (element) {
+      this.element = element
     }
 
     // No element found, let's create one instead
@@ -436,7 +438,8 @@ class Spriteling {
         element.style.backgroundPosition = '0 0'
 
         if (sheet.downsizeRatio > 1) {
-          element.style.backgroundSize = `${sheet.sheetWidth / sheet.downsizeRatio}px ${sheet.sheetHeight / sheet.downsizeRatio}px`
+          element.style.backgroundSize =
+            `${sheet.sheetWidth / sheet.downsizeRatio}px ${sheet.sheetHeight / sheet.downsizeRatio}px`
         }
 
         if (sheet.top !== null) {
@@ -533,7 +536,9 @@ class Spriteling {
         playhead.nextDelay /= playhead.tempo
         playhead.lastTime = time
 
-        this.log('info', `frame: ${playhead.currentFrame}, sprite: ${frame.sprite}, delay: ${playhead.nextDelay}, run: ${playhead.run}`)
+        this.log('info',
+          `frame: ${playhead.currentFrame}, sprite: ${frame.sprite}, delay: ${playhead.nextDelay}, run: ${playhead.run}`
+        )
       }
 
     } else {
