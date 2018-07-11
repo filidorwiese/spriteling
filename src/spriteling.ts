@@ -12,7 +12,6 @@ const playheadDefaults: Animation = {
   script: [],
   lastTime: 0,
   nextDelay: 0,
-  currentFrame: 0,
   currentSprite: 1,
   onPlay: null,
   onStop: null,
@@ -240,9 +239,9 @@ class Spriteling {
       }
 
       // Set starting frame
-      let currentFrame = 0
+      let currentFrame = -1
       if (animationOptions.reversed) {
-        currentFrame = animationScript.length - 1
+        currentFrame = animationScript.length
       }
 
       this.playhead = {
@@ -254,8 +253,8 @@ class Spriteling {
     }
 
     // Enter the animation loop
-    if (this.playhead.run !== 0) {
-      this.loop(0)
+    if (this.playhead.run !== 0 && this.playhead.play) {
+      this.loop()
     }
 
     // onPlay callback
@@ -299,9 +298,6 @@ class Spriteling {
   public async next(): Promise<void> {
     await this.loadingPromise
 
-    const frame = this.playhead.script[this.playhead.currentFrame]
-    this.drawFrame(frame)
-
     // Update frame counter
     this.playhead.currentFrame += 1
 
@@ -309,6 +305,14 @@ class Spriteling {
     if (this.playhead.currentFrame === this.playhead.script.length) {
       this.playhead.run -= 1
       this.playhead.currentFrame = 0
+    }
+
+    // Stop when playing and run reached 0
+    if (this.playhead.play && this.playhead.run === 0) {
+      this.stop()
+    } else {
+      const frame = this.playhead.script[this.playhead.currentFrame]
+      this.drawFrame(frame)
     }
   }
 
@@ -319,9 +323,6 @@ class Spriteling {
   public async previous(): Promise<void> {
     await this.loadingPromise
 
-    const frame = this.playhead.script[this.playhead.currentFrame]
-    this.drawFrame(frame)
-
     // Update frame counter
     this.playhead.currentFrame -= 1
 
@@ -329,6 +330,13 @@ class Spriteling {
     if (this.playhead.currentFrame < 0) {
       this.playhead.currentFrame = this.playhead.script.length - 1
       this.playhead.run -= 1
+    }
+
+    if (this.playhead.play && this.playhead.run === 0) {
+      this.stop()
+    } else {
+      const frame = this.playhead.script[this.playhead.currentFrame]
+      this.drawFrame(frame)
     }
   }
 
@@ -490,7 +498,7 @@ class Spriteling {
   /**
    * The animation loop
    */
-  private loop = (time: number) => {
+  private loop = (time: number = 0) => {
     const requestFrameId = raf(this.loop)
     const playhead = this.playhead
 
@@ -511,7 +519,7 @@ class Spriteling {
     }
   }
 
-  private render(time: number) {
+  private async render(time: number) {
     const element = this.element
     const playhead = this.playhead
 
@@ -519,24 +527,18 @@ class Spriteling {
     if (element.offsetParent !== null && this.inViewport()) {
 
       // Only play if run counter is still <> 0
-      if (playhead.run === 0) {
-
-        this.stop()
-
-      } else {
+      if (playhead.run !== 0) {
 
         if (playhead.reversed) {
-          this.previous()
+          await this.previous()
         } else {
-          this.next()
+          await this.next()
         }
 
         const frame = playhead.script[playhead.currentFrame]
-        playhead.nextDelay = frame.delay ? frame.delay : playhead.delay
-        playhead.nextDelay /= playhead.tempo
-        playhead.lastTime = time
-
         this.log('info', `run: ${playhead.run}, frame`, frame)
+
+        playhead.lastTime = time
       }
 
     } else {
@@ -551,10 +553,13 @@ class Spriteling {
   /**
    * Draw a single frame
    */
-  private drawFrame(frame) {
+  private drawFrame(frame: Frame) {
     const sheet = this.spriteSheet
     const playhead = this.playhead
     const element = this.element
+
+    this.playhead.nextDelay = frame.delay ? frame.delay : this.playhead.delay
+    this.playhead.nextDelay /= this.playhead.tempo
 
     if (frame.sprite !== playhead.currentSprite) {
 
@@ -587,7 +592,6 @@ class Spriteling {
       if (frame.left) {
         element.style.left = `${rect.left + frame.left}px`
       }
-
     }
 
     // onFrame callback
