@@ -144,7 +144,12 @@
       run: 1,
       delay: 100,
       onStop: function () {
-        sprite.play('stand-up')
+        sprite.play('stand-up', {
+            run: 1,
+            onStop: function () {
+              sprite.play('blink')
+          }
+        })
       }
     })
   })
