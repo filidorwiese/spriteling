@@ -2,7 +2,7 @@
 <html dir="ltr">
 <head>
   <meta charset="UTF-8" />
-  <script type="text/javascript" src="./spriteling.js"></script>
+  <script type="text/javascript" src="./spriteling.min.js"></script>
   <link href="https://fonts.googleapis.com/css?family=Karla" rel="stylesheet">
   <link href="./screen.css" rel="stylesheet" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no, user-scalable=no"/>
@@ -144,7 +144,12 @@
       run: 1,
       delay: 100,
       onStop: function () {
-        sprite.play('stand-up')
+        sprite.play('stand-up', {
+            run: 1,
+            onStop: function () {
+              sprite.play('blink')
+          }
+        })
       }
     })
   })

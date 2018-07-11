@@ -1,0 +1,87 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Playback play() should play current + options when called with options 1`] = `
+Object {
+  "currentFrame": 0,
+  "currentSprite": 2,
+  "delay": 3,
+  "lastTime": 0,
+  "nextDelay": 0.75,
+  "onFrame": null,
+  "onOutOfView": null,
+  "onPlay": null,
+  "onStop": null,
+  "play": true,
+  "reversed": false,
+  "run": 20,
+  "script": Array [
+    Object {
+      "sprite": 2,
+    },
+    Object {
+      "delay": 100,
+      "sprite": 3,
+    },
+    Object {
+      "sprite": 7,
+      "top": 1,
+    },
+    Object {
+      "right": 2,
+      "sprite": 1,
+    },
+    Object {
+      "bottom": 3,
+      "sprite": 5,
+    },
+    Object {
+      "left": 4,
+      "sprite": 6,
+    },
+  ],
+  "tempo": 4,
+}
+`;
+
+exports[`Playback play() should play script + options when called with scriptName + options 1`] = `
+Object {
+  "currentFrame": 5,
+  "currentSprite": 6,
+  "delay": 3,
+  "lastTime": 0,
+  "nextDelay": 0.75,
+  "onFrame": null,
+  "onOutOfView": null,
+  "onPlay": null,
+  "onStop": null,
+  "play": true,
+  "reversed": true,
+  "run": 2,
+  "script": Array [
+    Object {
+      "sprite": 2,
+    },
+    Object {
+      "delay": 100,
+      "sprite": 3,
+    },
+    Object {
+      "sprite": 7,
+      "top": 1,
+    },
+    Object {
+      "right": 2,
+      "sprite": 1,
+    },
+    Object {
+      "bottom": 3,
+      "sprite": 5,
+    },
+    Object {
+      "left": 4,
+      "sprite": 6,
+    },
+  ],
+  "tempo": 4,
+}
+`;
