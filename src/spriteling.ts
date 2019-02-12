@@ -13,6 +13,7 @@ const playheadDefaults: Animation = {
   lastTime: 0,
   nextDelay: 0,
   currentSprite: 1,
+  currentFrame: -1,
   onPlay: null,
   onStop: null,
   onFrame: null,

@@ -2,11 +2,11 @@
 
 exports[`Playback play() should play current + options when called with options 1`] = `
 Object {
-  "currentFrame": 0,
-  "currentSprite": 2,
+  "currentFrame": -1,
+  "currentSprite": 1,
   "delay": 3,
   "lastTime": 0,
-  "nextDelay": 0.75,
+  "nextDelay": 0,
   "onFrame": null,
   "onOutOfView": null,
   "onPlay": null,
@@ -45,11 +45,11 @@ Object {
 
 exports[`Playback play() should play script + options when called with scriptName + options 1`] = `
 Object {
-  "currentFrame": 5,
-  "currentSprite": 6,
+  "currentFrame": 6,
+  "currentSprite": 1,
   "delay": 3,
   "lastTime": 0,
-  "nextDelay": 0.75,
+  "nextDelay": 0,
   "onFrame": null,
   "onOutOfView": null,
   "onPlay": null,
