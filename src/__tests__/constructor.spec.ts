@@ -46,7 +46,7 @@ describe('Constructor', () => {
   it('should try to lookup element when selector string provided', () => {
     document.body.innerHTML = '<body><div id="sprite"></div></body>'
     const instance = new Spriteling({url: './some-image.png', cols: 5, rows: 10}, '#sprite')
-    const element = document.querySelector('#sprite')
+    const element = document.querySelector('#sprite') as HTMLElement
     expect(element.style.backgroundImage).toBe('url(./some-image.png)')
   })
 
@@ -59,7 +59,7 @@ describe('Constructor', () => {
   it('should use background-image when no url has been provided', () => {
     document.body.innerHTML = '<body><div id="sprite" style="background: url(./another-image.png)"></div></body>'
     const instance = new Spriteling({cols: 5, rows: 10}, '#sprite')
-    const element = document.querySelector('#sprite')
+    const element = document.querySelector('#sprite') as HTMLElement
     expect(element.style.backgroundImage).toBe('url(./another-image.png)')
   })
 
@@ -71,9 +71,10 @@ describe('Constructor', () => {
   })
 
   it('should error when no cols/rows are provided', () => {
-    const instance = new Spriteling({url: './some-image.png', cols: 5}, '', true)
+    let instance = new Spriteling({url: './some-image.png', rows: undefined, cols: 5}, '', true)
     expect(console.error).toHaveBeenCalledWith('Spriteling', 'options.rows not set')
-    const instance = new Spriteling({url: './some-image.png', rows: 10}, '', true)
+
+    instance = new Spriteling({url: './some-image.png', rows: 10, cols: undefined}, '', true)
     expect(console.error).toHaveBeenCalledWith('Spriteling', 'options.cols not set')
   })
 
@@ -87,7 +88,7 @@ describe('Constructor', () => {
       bottom: 3,
       left: 4
     })
-    const element = document.querySelector('.spriteling')
+    const element = document.querySelector('.spriteling') as HTMLElement
     expect(element.style.top).toBe('1px')
     expect(element.style.right).toBe('2px')
     expect(element.style.bottom).toBe('3px')

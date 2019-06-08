@@ -30,7 +30,7 @@ const workingRaf = (framesToRender: number, delay: number) => {
 }
 
 // Mock element.offsetParent property
-Object.defineProperties(window.HTMLElement.prototype, {
+Object.defineProperties((window as any).HTMLElement.prototype, {
   offsetParent: {
     get: () => 0
   }

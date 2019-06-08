@@ -21,7 +21,7 @@ const playheadDefaults: Animation = {
 }
 
 class Spriteling {
-  private spriteSheet: SpriteSheet = {
+  public spriteSheet: SpriteSheet = {
     loaded: false,
     url: null,
     cols: null,
