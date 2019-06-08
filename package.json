@@ -46,6 +46,7 @@
   "dependencies": {
     "es6-promise": "4.2.4",
     "image-loaded": "0.0.2",
-    "raf": "3.4.0"
+    "raf": "3.4.0",
+    "rollup": "1.14.4"
   }
 }
